@@ -7,16 +7,19 @@ import {
     Filter,
     ArrowUpRight,
     ArrowDownLeft,
-    Box
+    Box,
+    Pencil
 } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import api from '@/lib/api';
 import { ResumenInventario } from '@/types';
+import { EditMaterialModal } from '@/components/EditMaterialModal';
 
 export default function InventarioPage() {
     const [inventario, setInventario] = useState<ResumenInventario[]>([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
+    const [editingMaterial, setEditingMaterial] = useState<number | null>(null);
 
     useEffect(() => {
         const fetchInventario = async () => {
@@ -90,6 +93,7 @@ export default function InventarioPage() {
                                 <th className="px-6 py-4">Cantidad</th>
                                 <th className="px-6 py-4">Bodega</th>
                                 <th className="px-6 py-4 text-center">Estado</th>
+                                <th className="px-6 py-4 text-right"></th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
@@ -118,6 +122,15 @@ export default function InventarioPage() {
                                         <td className="px-6 py-4 text-center">
                                             {getEstadoBadge(item.estado)}
                                         </td>
+                                        <td className="px-6 py-4 text-right">
+                                            <button
+                                                onClick={() => setEditingMaterial(item.id_material)}
+                                                className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                                title="Editar producto"
+                                            >
+                                                <Pencil className="w-4 h-4" />
+                                            </button>
+                                        </td>
                                     </tr>
                                 ))
                             )}
@@ -125,6 +138,27 @@ export default function InventarioPage() {
                     </table>
                 </div>
             </section>
+
+            {/* Edit Modal */}
+            {editingMaterial && (
+                <EditMaterialModal
+                    isOpen={true}
+                    onClose={() => setEditingMaterial(null)}
+                    onSuccess={() => {
+                        setEditingMaterial(null);
+                        const fetchInventario = async () => {
+                            try {
+                                const res = await api.get('/movimientos/resumen_inventario/');
+                                setInventario(res.data);
+                            } catch (error) {
+                                console.error('Error fetching inventario:', error);
+                            }
+                        };
+                        fetchInventario();
+                    }}
+                    materialId={editingMaterial}
+                />
+            )}
         </div>
     );
 }

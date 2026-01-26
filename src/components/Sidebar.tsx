@@ -10,7 +10,8 @@ import {
     MapPin,
     Book,
     LogOut,
-    ChevronRight
+    ChevronRight,
+    PackageSearch
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -18,6 +19,7 @@ const navItems = [
     { name: 'Bienvenida', icon: LayoutDashboard, href: '/' },
     { name: 'Movimientos', icon: History, href: '/movimientos' },
     { name: 'Inventario', icon: Package, href: '/inventario' },
+    { name: 'Productos', icon: PackageSearch, href: '/materiales' },
     { name: 'Bodegas', icon: MapPin, href: '/bodegas' },
     { name: 'Diccionario', icon: Book, href: '/diccionario' },
 ];

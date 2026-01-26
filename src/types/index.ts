@@ -1,3 +1,9 @@
+export interface Marca {
+    id: number;
+    nombre: string;
+    activo: boolean;
+}
+
 export interface Bodega {
     id: number;
     nombre: string;
@@ -22,6 +28,9 @@ export interface Material {
     referencia?: string;
     nombre: string;
     unidad: string;
+    marca?: number;
+    marca_nombre?: string;
+    ultimo_precio?: number;
 }
 
 export interface Factura {
@@ -47,6 +56,8 @@ export interface Movimiento {
     tipo: TipoMovimiento;
     observaciones?: string;
     factura_manual?: string;
+    marca?: number;
+    marca_info?: Marca;
 }
 
 export interface ResumenInventario {

@@ -10,6 +10,8 @@ import {
     MapPin,
     Book,
     LogOut,
+    PieChart,
+    Box,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -18,6 +20,8 @@ const navItems = [
     { name: 'Movimientos', icon: History, href: '/movimientos' },
     { name: 'Inventario', icon: Package, href: '/inventario' },
     { name: 'Bodegas', icon: MapPin, href: '/bodegas' },
+    { name: 'Reportes', icon: PieChart, href: '/reportes' },
+    { name: 'Marcas', icon: Box, href: '/marcas' },
     { name: 'Diccionario', icon: Book, href: '/diccionario' },
 ];
 

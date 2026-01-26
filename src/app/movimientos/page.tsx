@@ -117,6 +117,7 @@ export default function MovimientosPage() {
                             <tr>
                                 <th className="px-6 py-4">Código</th>
                                 <th className="px-6 py-4">Nombre</th>
+                                <th className="px-6 py-4">Marca</th>
                                 <th className="px-6 py-4">Cantidad</th>
                                 <th className="px-6 py-4">Factura</th>
                                 <th className="px-6 py-4">Bodega</th>
@@ -129,14 +130,14 @@ export default function MovimientosPage() {
                             {loading ? (
                                 Array.from({ length: 5 }).map((_, i) => (
                                     <tr key={i} className="animate-pulse">
-                                        {Array.from({ length: 9 }).map((_, j) => (
+                                        {Array.from({ length: 10 }).map((_, j) => (
                                             <td key={j} className="px-6 py-4"><div className="h-4 bg-slate-100 rounded w-full"></div></td>
                                         ))}
                                     </tr>
                                 ))
                             ) : filteredMovimientos.length === 0 ? (
                                 <tr>
-                                    <td colSpan={9} className="px-6 py-12 text-center text-slate-400">
+                                    <td colSpan={10} className="px-6 py-12 text-center text-slate-400">
                                         No se encontraron movimientos.
                                     </td>
                                 </tr>
@@ -145,6 +146,9 @@ export default function MovimientosPage() {
                                     <tr key={mov.id} className="hover:bg-slate-50/80 transition-all cursor-default group">
                                         <td className="px-6 py-4 font-medium text-slate-700">{mov.material_info.codigo}</td>
                                         <td className="px-6 py-4 text-slate-900 font-medium">{mov.material_info.nombre}</td>
+                                        <td className="px-6 py-4 text-slate-600">
+                                            {mov.marca_info?.nombre || mov.material_info.marca_nombre || '-'}
+                                        </td>
                                         <td className="px-6 py-4 text-slate-700 font-semibold">{mov.cantidad} {mov.material_info.unidad}</td>
                                         <td className="px-6 py-4 text-slate-500 font-medium">
                                             {mov.factura_manual || mov.factura_info?.numero || '-'}
