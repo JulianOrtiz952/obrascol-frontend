@@ -38,7 +38,7 @@ export function RegistrarSalidaModal({ isOpen, onClose, onSuccess }: RegistrarSa
         if (isOpen) {
             const fetchData = async () => {
                 try {
-                    const bodRes = await api.get('/bodegas/');
+                    const bodRes = await api.get('bodegas/');
                     setBodegas(bodRes.data);
                 } catch (err) {
                     console.error('Error fetching bodegas:', err);

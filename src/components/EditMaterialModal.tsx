@@ -34,8 +34,8 @@ export function EditMaterialModal({ isOpen, onClose, onSuccess, materialId }: Ed
             const fetchData = async () => {
                 try {
                     const [matRes, marRes] = await Promise.all([
-                        api.get(`/materiales/${materialId}/`),
-                        api.get('/marcas/')
+                        api.get(`materiales/${materialId}/`),
+                        api.get('marcas/')
                     ]);
 
                     const mat = matRes.data;
@@ -93,7 +93,7 @@ export function EditMaterialModal({ isOpen, onClose, onSuccess, materialId }: Ed
                 }
             }
 
-            await api.patch(`/materiales/${materialId}/`, {
+            await api.patch(`materiales/${materialId}/`, {
                 ...formData,
                 marca: finalMarcaId || null
             });

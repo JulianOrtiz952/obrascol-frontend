@@ -43,9 +43,9 @@ export function RegistrarEntradaModal({ isOpen, onClose, onSuccess }: RegistrarE
             const fetchData = async () => {
                 try {
                     const [matRes, bodRes, marRes] = await Promise.all([
-                        api.get('/materiales/'),
-                        api.get('/bodegas/'),
-                        api.get('/marcas/'),
+                        api.get('materiales/'),
+                        api.get('bodegas/'),
+                        api.get('marcas/'),
                     ]);
                     setMateriales(matRes.data);
                     setBodegas(bodRes.data);
@@ -181,7 +181,7 @@ export function RegistrarEntradaModal({ isOpen, onClose, onSuccess }: RegistrarE
                 const originalMat = materiales.find(m => m.id.toString() === materialId);
                 if (originalMat && !originalMat.marca) {
                     try {
-                        await api.patch(`/materiales/${materialId}/`, { marca: parseInt(finalMarcaId) });
+                        await api.patch(`materiales/${materialId}/`, { marca: parseInt(finalMarcaId) });
                     } catch (patchErr) {
                         console.error('Error updating material brand:', patchErr);
                         // We continue even if patch fails, as the movement is the priority
