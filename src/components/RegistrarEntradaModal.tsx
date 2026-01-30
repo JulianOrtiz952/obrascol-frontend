@@ -28,7 +28,6 @@ export function RegistrarEntradaModal({ isOpen, onClose, onSuccess }: RegistrarE
         factura_manual: '',
         cantidad: '',
         unidad: 'pcs',
-        precio: '',
         fecha: new Date().toISOString().split('T')[0],
         observaciones: '',
     });
@@ -97,8 +96,7 @@ export function RegistrarEntradaModal({ isOpen, onClose, onSuccess }: RegistrarE
                 referencia: mat.referencia || '',
                 nombre: mat.nombre,
                 unidad: mat.unidad,
-                marca: mat.marca?.toString() || '',
-                precio: mat.ultimo_precio?.toString() || ''
+                marca: mat.marca?.toString() || ''
             }));
         } else {
             // New material candidate
@@ -127,8 +125,7 @@ export function RegistrarEntradaModal({ isOpen, onClose, onSuccess }: RegistrarE
                 nombre: mat.nombre,
                 unidad: mat.unidad,
                 barcode: mat.codigo_barras || mat.codigo,
-                marca: mat.marca?.toString() || '',
-                precio: mat.ultimo_precio?.toString() || ''
+                marca: mat.marca?.toString() || ''
             }));
         } else {
             setFormData(prev => ({
@@ -176,7 +173,7 @@ export function RegistrarEntradaModal({ isOpen, onClose, onSuccess }: RegistrarE
                     nombre: formData.nombre,
                     unidad: formData.unidad,
                     marca: finalMarcaId || null,
-                    ultimo_precio: formData.precio ? parseFloat(formData.precio) : null
+                    ultimo_precio: null
                 });
                 materialId = matRes.data.id;
             } else if (materialId && finalMarcaId) {
@@ -203,7 +200,7 @@ export function RegistrarEntradaModal({ isOpen, onClose, onSuccess }: RegistrarE
                 factura_manual: formData.factura_manual,
                 marca: finalMarcaId || null,
                 cantidad: parseInt(formData.cantidad),
-                precio: parseFloat(formData.precio),
+                precio: null,
                 fecha: submitDate,
                 tipo: 'Entrada',
                 observaciones: formData.observaciones
@@ -217,7 +214,7 @@ export function RegistrarEntradaModal({ isOpen, onClose, onSuccess }: RegistrarE
                 bodega: formData.bodega, // Keep bodega for convenience
                 marca: '',
                 factura_manual: '', cantidad: '', unidad: 'pcs',
-                precio: '', fecha: new Date().toISOString().split('T')[0],
+                fecha: new Date().toISOString().split('T')[0],
                 observaciones: ''
             });
             setIsNewMaterial(false);
@@ -435,18 +432,6 @@ export function RegistrarEntradaModal({ isOpen, onClose, onSuccess }: RegistrarE
                                 </select>
                             </div>
                         )}
-                        <div className="space-y-1.5">
-                            <label className="text-sm font-semibold text-slate-700">Precio *</label>
-                            <input
-                                type="number"
-                                step="0.01"
-                                required
-                                placeholder="0.00"
-                                className="w-full px-4 py-2 bg-slate-100 border border-slate-200 rounded-lg text-slate-900 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all"
-                                value={formData.precio}
-                                onChange={(e) => setFormData({ ...formData, precio: e.target.value })}
-                            />
-                        </div>
                     </div>
 
                     <div className="col-span-2 space-y-1.5">

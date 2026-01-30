@@ -30,7 +30,7 @@ export interface Material {
     unidad: string;
     marca?: number;
     marca_nombre?: string;
-    ultimo_precio?: number;
+    ultimo_precio?: number | null;
 }
 
 export interface Factura {
@@ -51,7 +51,7 @@ export interface Movimiento {
     factura?: number;
     factura_info?: Factura;
     cantidad: number;
-    precio: number;
+    precio?: number | null;
     fecha: string;
     tipo: TipoMovimiento;
     observaciones?: string;

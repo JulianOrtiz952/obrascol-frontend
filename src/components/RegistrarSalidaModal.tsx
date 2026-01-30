@@ -29,7 +29,6 @@ export function RegistrarSalidaModal({ isOpen, onClose, onSuccess }: RegistrarSa
         material: '',
         bodega: '',
         cantidad: '',
-        precio: '',
     });
 
     const [loading, setLoading] = useState(false);
@@ -87,13 +86,13 @@ export function RegistrarSalidaModal({ isOpen, onClose, onSuccess }: RegistrarSa
                 material: formData.material,
                 bodega: formData.bodega,
                 cantidad: parseInt(formData.cantidad),
-                precio: parseFloat(formData.precio) || 0,
+                precio: null,
                 tipo: 'Salida'
             });
 
             onSuccess();
             onClose();
-            setFormData({ material: '', bodega: '', cantidad: '', precio: '' });
+            setFormData({ material: '', bodega: '', cantidad: '' });
             setSelectedStockItem(null);
         } catch (err: any) {
             console.error('Error submitting movement:', err);
@@ -166,20 +165,6 @@ export function RegistrarSalidaModal({ isOpen, onClose, onSuccess }: RegistrarSa
                         />
                     </div>
 
-                    <div className="space-y-1.5">
-                        <label className="text-sm font-semibold text-slate-700">Precio (Referencia)</label>
-                        <div className="relative">
-                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">$</span>
-                            <input
-                                type="number"
-                                step="0.01"
-                                placeholder="0.00"
-                                className="w-full pl-8 pr-4 py-2 border border-slate-200 rounded-lg text-slate-900 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none transition-all bg-white"
-                                value={formData.precio}
-                                onChange={(e) => setFormData({ ...formData, precio: e.target.value })}
-                            />
-                        </div>
-                    </div>
 
                     {selectedStockItem && parseInt(formData.cantidad) > selectedStockItem.cantidad && (
                         <div className="col-span-2 flex items-center gap-2 text-rose-600 bg-rose-50 p-3 rounded-lg border border-rose-100 italic text-sm">

@@ -24,22 +24,19 @@ export default function ReportesPage() {
     const [resumen, setResumen] = useState<any>(null);
     const [topEntradas, setTopEntradas] = useState<any[]>([]);
     const [topSalidas, setTopSalidas] = useState<any[]>([]);
-    const [preciosPromedio, setPreciosPromedio] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchReportes = async () => {
             try {
-                const [resRes, entRes, salRes, promRes] = await Promise.all([
+                const [resRes, entRes, salRes] = await Promise.all([
                     api.get('reportes/resumen_general/'),
                     api.get('reportes/top_marcas_entradas/'),
-                    api.get('reportes/top_marcas_salidas/'),
-                    api.get('reportes/productos_promedio/')
+                    api.get('reportes/top_marcas_salidas/')
                 ]);
                 setResumen(resRes.data);
                 setTopEntradas(entRes.data);
                 setTopSalidas(salRes.data);
-                setPreciosPromedio(promRes.data);
             } catch (err) {
                 console.error('Error fetching reports:', err);
             } finally {
@@ -135,43 +132,6 @@ export default function ReportesPage() {
                 </div>
             </div>
 
-            {/* Average Prices Table */}
-            <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                <div className="p-6 border-b border-slate-200">
-                    <h3 className="text-lg font-bold text-slate-800">Precios Promedio por Producto</h3>
-                </div>
-                <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left">
-                        <thead className="bg-slate-50 text-slate-600 font-medium">
-                            <tr>
-                                <th className="px-6 py-4">Código</th>
-                                <th className="px-6 py-4">Producto</th>
-                                <th className="px-6 py-4">Marca</th>
-                                <th className="px-6 py-4 text-right">Precio Promedio</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-100">
-                            {preciosPromedio.map((item: any, i: number) => (
-                                <tr key={i} className="hover:bg-slate-50">
-                                    <td className="px-6 py-4 font-mono text-slate-500">{item.codigo}</td>
-                                    <td className="px-6 py-4 font-medium text-slate-900">{item.nombre}</td>
-                                    <td className="px-6 py-4 text-slate-600">{item.marca}</td>
-                                    <td className="px-6 py-4 text-right font-mono text-emerald-600 font-medium">
-                                        ${formatCustomNumber(item.precio_promedio)}
-                                    </td>
-                                </tr>
-                            ))}
-                            {preciosPromedio.length === 0 && (
-                                <tr>
-                                    <td colSpan={4} className="px-6 py-8 text-center text-slate-500">
-                                        No hay datos disponibles
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
         </div >
     );
 }
