@@ -29,7 +29,7 @@ export default function MovimientosPage() {
     const fetchMovimientos = async () => {
         setLoading(true);
         try {
-            const res = await api.get('/movimientos/');
+            const res = await api.get('movimientos/');
             setMovimientos(res.data);
         } catch (error) {
             console.error('Error fetching movimientos:', error);

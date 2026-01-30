@@ -83,7 +83,7 @@ export function RegistrarSalidaModal({ isOpen, onClose, onSuccess }: RegistrarSa
 
         setLoading(true);
         try {
-            await api.post('/movimientos/', {
+            await api.post('movimientos/', {
                 material: formData.material,
                 bodega: formData.bodega,
                 cantidad: parseInt(formData.cantidad),

@@ -29,8 +29,8 @@ export default function MaterialesPage() {
         setLoading(true);
         try {
             const [matRes, marRes] = await Promise.all([
-                api.get('/materiales/'),
-                api.get('/marcas/')
+                api.get('materiales/'),
+                api.get('marcas/')
             ]);
             setMateriales(matRes.data);
             setMarcas(marRes.data);

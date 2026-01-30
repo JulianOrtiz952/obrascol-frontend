@@ -18,7 +18,7 @@ export default function MarcasPage() {
 
     const fetchMarcas = async () => {
         try {
-            const res = await api.get('/marcas/');
+            const res = await api.get('marcas/');
             setMarcas(res.data);
         } catch (err) {
             console.error('Error fetching marcas:', err);
@@ -53,7 +53,7 @@ export default function MarcasPage() {
             if (editingMarca) {
                 await api.patch(`/marcas/${editingMarca.id}/`, formData);
             } else {
-                await api.post('/marcas/', formData);
+                await api.post('marcas/', formData);
             }
             fetchMarcas();
             setIsModalOpen(false);
@@ -126,8 +126,8 @@ export default function MarcasPage() {
                                     </td>
                                     <td className="px-6 py-4 text-center">
                                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${marca.activo
-                                                ? 'bg-emerald-100 text-emerald-800'
-                                                : 'bg-slate-100 text-slate-600'
+                                            ? 'bg-emerald-100 text-emerald-800'
+                                            : 'bg-slate-100 text-slate-600'
                                             }`}>
                                             {marca.activo ? 'Activo' : 'Inactivo'}
                                         </span>
@@ -144,8 +144,8 @@ export default function MarcasPage() {
                                             <button
                                                 onClick={() => handleToggleActive(marca)}
                                                 className={`p-1.5 rounded-lg transition-colors ${marca.activo
-                                                        ? 'text-slate-500 hover:text-rose-600 hover:bg-rose-50'
-                                                        : 'text-slate-500 hover:text-emerald-600 hover:bg-emerald-50'
+                                                    ? 'text-slate-500 hover:text-rose-600 hover:bg-rose-50'
+                                                    : 'text-slate-500 hover:text-emerald-600 hover:bg-emerald-50'
                                                     }`}
                                                 title={marca.activo ? "Desactivar" : "Activar"}
                                             >

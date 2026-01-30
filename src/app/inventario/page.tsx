@@ -24,7 +24,7 @@ export default function InventarioPage() {
     useEffect(() => {
         const fetchInventario = async () => {
             try {
-                const res = await api.get('/movimientos/resumen_inventario/');
+                const res = await api.get('movimientos/resumen_inventario/');
                 setInventario(res.data);
             } catch (error) {
                 console.error('Error fetching inventario:', error);
@@ -148,7 +148,7 @@ export default function InventarioPage() {
                         setEditingMaterial(null);
                         const fetchInventario = async () => {
                             try {
-                                const res = await api.get('/movimientos/resumen_inventario/');
+                                const res = await api.get('movimientos/resumen_inventario/');
                                 setInventario(res.data);
                             } catch (error) {
                                 console.error('Error fetching inventario:', error);

@@ -31,10 +31,10 @@ export default function ReportesPage() {
         const fetchReportes = async () => {
             try {
                 const [resRes, entRes, salRes, promRes] = await Promise.all([
-                    api.get('/reportes/resumen_general/'),
-                    api.get('/reportes/top_marcas_entradas/'),
-                    api.get('/reportes/top_marcas_salidas/'),
-                    api.get('/reportes/productos_promedio/')
+                    api.get('reportes/resumen_general/'),
+                    api.get('reportes/top_marcas_entradas/'),
+                    api.get('reportes/top_marcas_salidas/'),
+                    api.get('reportes/productos_promedio/')
                 ]);
                 setResumen(resRes.data);
                 setTopEntradas(entRes.data);

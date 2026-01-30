@@ -60,7 +60,7 @@ export function EditMaterialModal({ isOpen, onClose, onSuccess, materialId }: Ed
     const handleCreateMarca = async () => {
         if (!newMarcaName.trim()) return;
         try {
-            const res = await api.post('/marcas/', { nombre: newMarcaName, activo: true });
+            const res = await api.post('marcas/', { nombre: newMarcaName, activo: true });
             const newMarca = res.data;
             setMarcas(prev => [...prev, newMarca]);
             setFormData(prev => ({ ...prev, marca: newMarca.id.toString() }));
@@ -80,7 +80,7 @@ export function EditMaterialModal({ isOpen, onClose, onSuccess, materialId }: Ed
             // Handle pending brand creation similar to RegistrarEntradaModal
             if (isCreatingMarca && newMarcaName.trim()) {
                 try {
-                    const marcaRes = await api.post('/marcas/', { nombre: newMarcaName, activo: true });
+                    const marcaRes = await api.post('marcas/', { nombre: newMarcaName, activo: true });
                     const newMarca = marcaRes.data;
                     setMarcas(prev => [...prev, newMarca]);
                     finalMarcaId = newMarca.id.toString();

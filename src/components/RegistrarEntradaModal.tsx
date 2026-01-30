@@ -65,7 +65,7 @@ export function RegistrarEntradaModal({ isOpen, onClose, onSuccess }: RegistrarE
     const handleCreateMarca = async () => {
         if (!newMarcaName.trim()) return;
         try {
-            const res = await api.post('/marcas/', { nombre: newMarcaName, activo: true });
+            const res = await api.post('marcas/', { nombre: newMarcaName, activo: true });
 
             // Create the new list including the new brand
             const newMarca = res.data;
@@ -153,7 +153,7 @@ export function RegistrarEntradaModal({ isOpen, onClose, onSuccess }: RegistrarE
             // Handle pending brand creation (if user forgot to click check)
             if (isCreatingMarca && newMarcaName.trim()) {
                 try {
-                    const marcaRes = await api.post('/marcas/', { nombre: newMarcaName, activo: true });
+                    const marcaRes = await api.post('marcas/', { nombre: newMarcaName, activo: true });
                     const newMarca = marcaRes.data;
                     setMarcas(prev => [...prev, newMarca]);
                     finalMarcaId = newMarca.id.toString();
@@ -169,7 +169,7 @@ export function RegistrarEntradaModal({ isOpen, onClose, onSuccess }: RegistrarE
                 }
             }
             if (isNewMaterial) {
-                const matRes = await api.post('/materiales/', {
+                const matRes = await api.post('materiales/', {
                     codigo: formData.codigo,
                     codigo_barras: formData.barcode,
                     referencia: formData.referencia,
@@ -197,7 +197,7 @@ export function RegistrarEntradaModal({ isOpen, onClose, onSuccess }: RegistrarE
             const todayStr = new Date().toISOString().split('T')[0];
             const submitDate = formData.fecha === todayStr ? new Date().toISOString() : formData.fecha;
 
-            await api.post('/movimientos/', {
+            await api.post('movimientos/', {
                 material: materialId,
                 bodega: formData.bodega,
                 factura_manual: formData.factura_manual,
