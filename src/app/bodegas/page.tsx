@@ -121,8 +121,8 @@ export default function BodegasPage() {
                         <div
                             key={bodega.id}
                             className={`bg-white border rounded-2xl shadow-sm transition-all ${selectedBodega?.id === bodega.id
-                                    ? 'border-orange-500 shadow-md'
-                                    : 'border-slate-200 hover:border-slate-300'
+                                ? 'border-orange-500 shadow-md'
+                                : 'border-slate-200 hover:border-slate-300'
                                 }`}
                         >
                             <div className="p-6">
@@ -130,7 +130,7 @@ export default function BodegasPage() {
                                     <div className="flex-1">
                                         <div className="flex items-center gap-2 mb-2">
                                             <h3 className="text-xl font-bold text-slate-900">{bodega.nombre}</h3>
-                                            <Badge variant={bodega.activo ? 'success' : 'secondary'}>
+                                            <Badge variant={bodega.activo ? 'success' : 'neutral'}>
                                                 {bodega.activo ? 'Activo' : 'Inactivo'}
                                             </Badge>
                                         </div>
@@ -164,8 +164,8 @@ export default function BodegasPage() {
                                     <button
                                         onClick={() => handleToggleActivo(bodega)}
                                         className={`p-2 rounded-lg transition-all ${bodega.activo
-                                                ? 'text-orange-600 hover:bg-orange-50'
-                                                : 'text-emerald-600 hover:bg-emerald-50'
+                                            ? 'text-orange-600 hover:bg-orange-50'
+                                            : 'text-emerald-600 hover:bg-emerald-50'
                                             }`}
                                         title={bodega.activo ? 'Desactivar' : 'Activar'}
                                     >
