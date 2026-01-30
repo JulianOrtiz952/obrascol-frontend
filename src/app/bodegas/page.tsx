@@ -144,7 +144,7 @@ export default function BodegasPage() {
                                 <div className="flex items-center gap-2 text-sm text-slate-600 mb-4 p-3 bg-slate-50 rounded-lg">
                                     <Package className="w-4 h-4" />
                                     <span className="font-medium">{bodega.materiales_count || 0}</span>
-                                    <span>materiales en stock</span>
+                                    <span>materiales en stock.</span>
                                 </div>
 
                                 <div className="flex items-center gap-2">
