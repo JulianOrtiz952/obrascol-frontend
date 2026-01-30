@@ -71,7 +71,7 @@ export default function BodegasPage() {
     };
 
     return (
-        <div className="p-8 max-w-7xl">
+        <div className="p-8 w-full">
             <header className="mb-8 flex items-center justify-between">
                 <div>
                     <h1 className="text-4xl font-bold text-slate-900 mb-2">Bodegas</h1>
@@ -116,7 +116,7 @@ export default function BodegasPage() {
                     </button>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
                     {bodegasList.map((bodega) => (
                         <div
                             key={bodega.id}
