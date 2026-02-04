@@ -1,14 +1,29 @@
-import type { Metadata } from "next";
+'use client';
+
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Topbar } from "@/components/Topbar";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export const metadata: Metadata = {
-  title: "Obrascol - Gestión de Inventario",
-  description: "Sistema de gestión de inventario para Obrascol",
-};
+function LayoutContent({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const isLoginPage = pathname === '/login';
+
+  return (
+    <body className={`${inter.className} antialiased bg-slate-50 text-slate-900 min-h-screen`}>
+      <AuthProvider>
+        {!isLoginPage && <Topbar />}
+        <main className={cn("min-h-screen", !isLoginPage && "pt-16")}>
+          {children}
+        </main>
+      </AuthProvider>
+    </body>
+  );
+}
 
 export default function RootLayout({
   children,
@@ -17,12 +32,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
-      <body className={`${inter.className} antialiased bg-slate-50 text-slate-900 min-h-screen`}>
-        <Topbar />
-        <main className="pt-16 min-h-screen">
-          {children}
-        </main>
-      </body>
+      <LayoutContent>{children}</LayoutContent>
     </html>
   );
 }

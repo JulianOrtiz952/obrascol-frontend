@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import api from '@/lib/api';
-import { Material, Marca } from '@/types';
+import { Material, Marca, UnidadMedida } from '@/types';
 import { Modal } from './ui/Modal';
 import { Check, Plus } from 'lucide-react';
 
@@ -15,6 +15,7 @@ interface EditMaterialModalProps {
 
 export function EditMaterialModal({ isOpen, onClose, onSuccess, materialId }: EditMaterialModalProps) {
     const [marcas, setMarcas] = useState<Marca[]>([]);
+    const [unidadesMedida, setUnidadesMedida] = useState<UnidadMedida[]>([]);
     const [loading, setLoading] = useState(false);
 
     const [formData, setFormData] = useState({
@@ -33,9 +34,10 @@ export function EditMaterialModal({ isOpen, onClose, onSuccess, materialId }: Ed
         if (isOpen && materialId) {
             const fetchData = async () => {
                 try {
-                    const [matRes, marRes] = await Promise.all([
+                    const [matRes, marRes, uniRes] = await Promise.all([
                         api.get(`materiales/${materialId}/`),
-                        api.get('marcas/')
+                        api.get('marcas/'),
+                        api.get('unidades/'),
                     ]);
 
                     const mat = matRes.data;
@@ -48,6 +50,7 @@ export function EditMaterialModal({ isOpen, onClose, onSuccess, materialId }: Ed
                         codigo_barras: mat.codigo_barras || ''
                     });
                     setMarcas(marRes.data);
+                    setUnidadesMedida(uniRes.data);
                 } catch (err) {
                     console.error('Error fetching material data:', err);
                     onClose();
@@ -109,8 +112,8 @@ export function EditMaterialModal({ isOpen, onClose, onSuccess, materialId }: Ed
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} title="Editar Producto">
-            <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+            <form onSubmit={handleSubmit} className="space-y-3">
+                <div className="grid grid-cols-2 gap-x-4 gap-y-3">
                     <div className="space-y-1.5">
                         <label className="text-sm font-semibold text-slate-700">Código</label>
                         <input
@@ -143,7 +146,7 @@ export function EditMaterialModal({ isOpen, onClose, onSuccess, materialId }: Ed
                     />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-x-4 gap-y-3">
                     <div className="space-y-1.5">
                         <label className="text-sm font-semibold text-slate-700">Unidad</label>
                         <select
@@ -152,11 +155,19 @@ export function EditMaterialModal({ isOpen, onClose, onSuccess, materialId }: Ed
                             value={formData.unidad}
                             onChange={(e) => setFormData({ ...formData, unidad: e.target.value })}
                         >
-                            <option value="pcs">pcs</option>
-                            <option value="m">m</option>
-                            <option value="L">L</option>
-                            <option value="kg">kg</option>
-                            <option value="paquete">paquete</option>
+                            <option value="">Seleccionar...</option>
+                            {unidadesMedida.filter(u => u.activo).map(u => (
+                                <option key={u.id} value={u.abreviacion}>{u.nombre} ({u.abreviacion})</option>
+                            ))}
+                            {unidadesMedida.length === 0 && (
+                                <>
+                                    <option value="pcs">pcs</option>
+                                    <option value="m">m</option>
+                                    <option value="L">L</option>
+                                    <option value="kg">kg</option>
+                                    <option value="paquete">paquete</option>
+                                </>
+                            )}
                         </select>
                     </div>
 

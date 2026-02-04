@@ -15,18 +15,25 @@ import {
     Pie,
     Cell
 } from 'recharts';
-import { Package, ArrowDown, ArrowUp } from 'lucide-react';
+import { Package, ArrowDown, ArrowUp, Shield } from 'lucide-react';
 import { formatCustomNumber } from '@/lib/utils';
+import { useAuth } from '@/contexts/AuthContext';
 
 const COLORS = ['#f97316', '#3b82f6', '#10b981', '#ef4444', '#8b5cf6'];
 
 export default function ReportesPage() {
+    const { user } = useAuth();
     const [resumen, setResumen] = useState<any>(null);
     const [topEntradas, setTopEntradas] = useState<any[]>([]);
     const [topSalidas, setTopSalidas] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        if (!user) {
+            setLoading(false);
+            return;
+        }
+
         const fetchReportes = async () => {
             try {
                 const [resRes, entRes, salRes] = await Promise.all([
@@ -45,11 +52,12 @@ export default function ReportesPage() {
         };
 
         fetchReportes();
-    }, []);
+    }, [user]);
 
     if (loading) {
         return <div className="p-8 text-center text-slate-500">Cargando reportes...</div>;
     }
+
 
     return (
         <div className="p-8 max-w-7xl mx-auto space-y-8">

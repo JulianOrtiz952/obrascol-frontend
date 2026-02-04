@@ -7,6 +7,7 @@ import { bodegas } from '@/lib/api';
 import { Badge } from '@/components/ui/Badge';
 import CreateBodegaModal from '@/components/CreateBodegaModal';
 import EditBodegaModal from '@/components/EditBodegaModal';
+import { ConfirmModal } from '@/components/ui/ConfirmModal';
 
 export default function BodegasPage() {
     const [bodegasList, setBodegasList] = useState<Bodega[]>([]);
@@ -16,6 +17,15 @@ export default function BodegasPage() {
     const [showEditModal, setShowEditModal] = useState(false);
     const [incluirInactivas, setIncluirInactivas] = useState(false);
     const [loading, setLoading] = useState(true);
+
+    // Confirm Modal state
+    const [confirmState, setConfirmState] = useState<{
+        isOpen: boolean;
+        bodega: Bodega | null;
+    }>({
+        isOpen: false,
+        bodega: null
+    });
 
     useEffect(() => {
         fetchBodegas();
@@ -52,7 +62,17 @@ export default function BodegasPage() {
         }
     };
 
-    const handleToggleActivo = async (bodega: Bodega) => {
+    const handleConfirmToggle = (bodega: Bodega) => {
+        setConfirmState({
+            isOpen: true,
+            bodega
+        });
+    };
+
+    const handleToggleActivo = async () => {
+        const { bodega } = confirmState;
+        if (!bodega) return;
+
         try {
             await bodegas.toggleActivo(bodega.id);
             fetchBodegas();
@@ -162,7 +182,7 @@ export default function BodegasPage() {
                                         <Edit2 className="w-4 h-4" />
                                     </button>
                                     <button
-                                        onClick={() => handleToggleActivo(bodega)}
+                                        onClick={() => handleConfirmToggle(bodega)}
                                         className={`p-2 rounded-lg transition-all ${bodega.activo
                                             ? 'text-orange-600 hover:bg-orange-50'
                                             : 'text-emerald-600 hover:bg-emerald-50'
@@ -232,6 +252,17 @@ export default function BodegasPage() {
                     }}
                 />
             )}
+
+            {/* Styled Confirmation Modal */}
+            <ConfirmModal
+                isOpen={confirmState.isOpen}
+                onClose={() => setConfirmState({ ...confirmState, isOpen: false })}
+                onConfirm={handleToggleActivo}
+                title={confirmState.bodega?.activo ? "Desactivar Bodega" : "Activar Bodega"}
+                message={`¿Estás seguro de que deseas ${confirmState.bodega?.activo ? 'desactivar' : 'activar'} la bodega "${confirmState.bodega?.nombre}"?`}
+                confirmText={confirmState.bodega?.activo ? "Desactivar" : "Activar"}
+                variant={confirmState.bodega?.activo ? "danger" : "success"}
+            />
         </div>
     );
 }

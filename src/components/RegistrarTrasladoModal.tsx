@@ -2,34 +2,27 @@
 
 import React, { useState, useEffect } from 'react';
 import api from '@/lib/api';
-import { Material, Bodega } from '@/types';
+import { Bodega, BodegaStock } from '@/types';
 import { Modal } from './ui/Modal';
-import { Save, AlertCircle, Scan, Tag, Type, Search } from 'lucide-react';
+import { Save, AlertCircle, ArrowRightLeft, Scan, Tag, Type } from 'lucide-react';
 
-interface StockItem {
-    id_material: number;
-    codigo: string;
-    referencia?: string;
-    nombre: string;
-    cantidad: number;
-    unidad: string;
-}
-
-interface RegistrarSalidaModalProps {
+interface RegistrarTrasladoModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSuccess: () => void;
 }
 
-export function RegistrarSalidaModal({ isOpen, onClose, onSuccess }: RegistrarSalidaModalProps) {
+export function RegistrarTrasladoModal({ isOpen, onClose, onSuccess }: RegistrarTrasladoModalProps) {
     const [bodegas, setBodegas] = useState<Bodega[]>([]);
-    const [availableStock, setAvailableStock] = useState<StockItem[]>([]);
-    const [selectedStockItem, setSelectedStockItem] = useState<StockItem | null>(null);
+    const [availableStock, setAvailableStock] = useState<BodegaStock[]>([]);
+    const [selectedStockItem, setSelectedStockItem] = useState<BodegaStock | null>(null);
 
     const [formData, setFormData] = useState({
         material: '',
-        bodega: '',
+        bodega_origen: '',
+        bodega_destino: '',
         cantidad: '',
+        observaciones: '',
     });
 
     const [searchType, setSearchType] = useState<'barcode' | 'reference' | 'name'>('barcode');
@@ -58,15 +51,15 @@ export function RegistrarSalidaModal({ isOpen, onClose, onSuccess }: RegistrarSa
         setFormData(prev => ({ ...prev, material: '' }));
     };
 
-    const handleBodegaChange = async (id: string) => {
-        setFormData(prev => ({ ...prev, bodega: id, material: '' }));
+    const handleBodegaOrigenChange = async (id: string) => {
+        setFormData(prev => ({ ...prev, bodega_origen: id, material: '' }));
         setSelectedStockItem(null);
         setAvailableStock([]);
 
         if (id) {
             setFetchingStock(true);
             try {
-                const stockRes = await api.get(`/bodegas/${id}/stock_actual/`);
+                const stockRes = await api.get(`bodegas/${id}/stock_actual/`);
                 setAvailableStock(stockRes.data);
             } catch (err) {
                 console.error('Error fetching warehouse stock:', err);
@@ -78,7 +71,7 @@ export function RegistrarSalidaModal({ isOpen, onClose, onSuccess }: RegistrarSa
 
     const handleSearchChange = (val: string) => {
         setSearchValue(val);
-        // Reset selection if user is typing (except for exact barcode match)
+        // Reset selection if user is typing (except for exact match in barcode mode)
         let item = null;
         if (searchType === 'barcode') {
             item = availableStock.find(s => s.codigo.toLowerCase() === val.toLowerCase());
@@ -105,6 +98,11 @@ export function RegistrarSalidaModal({ isOpen, onClose, onSuccess }: RegistrarSa
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
+        if (formData.bodega_origen === formData.bodega_destino) {
+            alert('La bodega de destino debe ser diferente a la de origen.');
+            return;
+        }
+
         if (selectedStockItem && parseInt(formData.cantidad) > selectedStockItem.cantidad) {
             alert(`Stock insuficiente. Disponible: ${selectedStockItem.cantidad}`);
             return;
@@ -114,19 +112,28 @@ export function RegistrarSalidaModal({ isOpen, onClose, onSuccess }: RegistrarSa
         try {
             await api.post('movimientos/', {
                 material: formData.material,
-                bodega: formData.bodega,
+                bodega: formData.bodega_origen,
+                bodega_destino: formData.bodega_destino,
                 cantidad: parseInt(formData.cantidad),
                 precio: null,
-                tipo: 'Salida'
+                tipo: 'Traslado',
+                observaciones: formData.observaciones
             });
 
             onSuccess();
             onClose();
-            setFormData({ material: '', bodega: '', cantidad: '' });
+            // Reset form
+            setFormData({
+                material: '',
+                bodega_origen: '',
+                bodega_destino: '',
+                cantidad: '',
+                observaciones: ''
+            });
             setSelectedStockItem(null);
         } catch (err: any) {
-            console.error('Error submitting movement:', err);
-            const errorMsg = err.response?.data?.non_field_errors?.[0] || 'Error al registrar la salida.';
+            console.error('Error submitting transfer:', err);
+            const errorMsg = err.response?.data?.non_field_errors?.[0] || 'Error al registrar el traslado.';
             alert(errorMsg);
         } finally {
             setLoading(false);
@@ -134,22 +141,43 @@ export function RegistrarSalidaModal({ isOpen, onClose, onSuccess }: RegistrarSa
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Registrar Salida de Material">
-            <p className="text-slate-500 text-sm mb-6 -mt-2">Seleccione la bodega de origen para ver los materiales disponibles.</p>
+        <Modal isOpen={isOpen} onClose={onClose} title="Registrar Traslado de Material">
+            <p className="text-slate-500 text-sm mb-6 -mt-2">Mueva productos entre bodegas de forma directa.</p>
 
             <form onSubmit={handleSubmit} className="space-y-3.5">
                 <div className="grid grid-cols-2 gap-x-4 gap-y-3">
-                    <div className="col-span-2 space-y-1.5">
-                        <label className="text-sm font-semibold text-slate-700">Bodega de Origen *</label>
+                    <div className="space-y-1.5">
+                        <label className="text-sm font-semibold text-slate-700">Bodega Origen *</label>
                         <select
                             required
-                            className="w-full px-4 py-2 border border-slate-200 rounded-lg text-slate-900 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none transition-all bg-white"
-                            value={formData.bodega}
-                            onChange={(e) => handleBodegaChange(e.target.value)}
+                            className="w-full px-4 py-2 border border-slate-200 rounded-lg text-slate-900 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all bg-white"
+                            value={formData.bodega_origen}
+                            onChange={(e) => handleBodegaOrigenChange(e.target.value)}
                         >
-                            <option value="" className="text-slate-400">Seleccione bodega...</option>
+                            <option value="">Seleccione origen...</option>
                             {bodegas.map(b => (
-                                <option key={b.id} value={b.id} className="text-slate-900">{b.nombre}</option>
+                                <option key={b.id} value={b.id}>{b.nombre}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="space-y-1.5">
+                        <label className="text-sm font-semibold text-slate-700">Bodega Destino *</label>
+                        <select
+                            required
+                            className="w-full px-4 py-2 border border-slate-200 rounded-lg text-slate-900 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all bg-white"
+                            value={formData.bodega_destino}
+                            onChange={(e) => setFormData({ ...formData, bodega_destino: e.target.value })}
+                        >
+                            <option value="">Seleccione destino...</option>
+                            {bodegas.map(b => (
+                                <option
+                                    key={b.id}
+                                    value={b.id}
+                                    disabled={b.id.toString() === formData.bodega_origen}
+                                >
+                                    {b.nombre} {b.id.toString() === formData.bodega_origen ? '(Origen)' : ''}
+                                </option>
                             ))}
                         </select>
                     </div>
@@ -191,12 +219,12 @@ export function RegistrarSalidaModal({ isOpen, onClose, onSuccess }: RegistrarSa
                             }`}>
                             <input
                                 type="text"
-                                disabled={!formData.bodega || fetchingStock}
+                                disabled={!formData.bodega_origen || fetchingStock}
                                 placeholder={
-                                    !formData.bodega ? "Primero seleccione bodega" :
-                                        searchType === 'barcode' ? "Escanee o escriba el código..." :
+                                    !formData.bodega_origen ? "Primero seleccione bodega origen" :
+                                        searchType === 'barcode' ? "Escanee o escribe el código..." :
                                             searchType === 'reference' ? "Escriba la referencia..." :
-                                                "Escriba el nombre..."
+                                                "Escribe el nombre..."
                                 }
                                 className={`w-full px-4 py-2.5 bg-white border rounded-lg text-slate-900 outline-none transition-all ${searchType === 'barcode' ? 'border-orange-200 focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 font-mono' :
                                     searchType === 'reference' ? 'border-blue-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500' :
@@ -206,8 +234,8 @@ export function RegistrarSalidaModal({ isOpen, onClose, onSuccess }: RegistrarSa
                                 onChange={(e) => handleSearchChange(e.target.value)}
                             />
 
-                            {/* Dropdown for results if needed or just confirmation */}
-                            {searchValue && !selectedStockItem && !fetchingStock && formData.bodega && (
+                            {/* Dropdown for results */}
+                            {searchValue && !selectedStockItem && !fetchingStock && formData.bodega_origen && (
                                 <div className="mt-2 p-2 bg-white border border-slate-100 rounded-lg shadow-sm max-h-40 overflow-y-auto space-y-1 z-10 relative">
                                     {availableStock
                                         .filter(s =>
@@ -260,12 +288,12 @@ export function RegistrarSalidaModal({ isOpen, onClose, onSuccess }: RegistrarSa
                         </div>
                     </div>
 
-                    <div className="space-y-1.5">
+                    <div className="col-span-2 space-y-1.5">
                         <div className="flex justify-between items-center">
                             <label className="text-sm font-semibold text-slate-700">Cantidad *</label>
                             {selectedStockItem && (
-                                <span className="text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-100">
-                                    Máx: {selectedStockItem.cantidad}
+                                <span className="text-[10px] font-bold text-orange-600 bg-orange-50 px-2 py-0.5 rounded border border-orange-100">
+                                    Máx: {selectedStockItem.cantidad} {selectedStockItem.unidad}
                                 </span>
                             )}
                         </div>
@@ -275,19 +303,22 @@ export function RegistrarSalidaModal({ isOpen, onClose, onSuccess }: RegistrarSa
                             min="1"
                             max={selectedStockItem?.cantidad}
                             placeholder="0"
-                            className="w-full px-4 py-2 border border-slate-200 rounded-lg text-slate-900 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none transition-all bg-white"
+                            className="w-full px-4 py-2 border border-slate-200 rounded-lg text-slate-900 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all bg-white"
                             value={formData.cantidad}
                             onChange={(e) => setFormData({ ...formData, cantidad: e.target.value })}
                         />
                     </div>
 
-
-                    {selectedStockItem && parseInt(formData.cantidad) > selectedStockItem.cantidad && (
-                        <div className="col-span-2 flex items-center gap-2 text-rose-600 bg-rose-50 p-3 rounded-lg border border-rose-100 italic text-sm">
-                            <AlertCircle className="w-4 h-4" />
-                            <span>La cantidad supera el stock disponible en esta bodega.</span>
-                        </div>
-                    )}
+                    <div className="col-span-2 space-y-1.5">
+                        <label className="text-sm font-semibold text-slate-700">Observaciones</label>
+                        <textarea
+                            placeholder="Motivo del traslado (opcional)..."
+                            rows={2}
+                            className="w-full px-4 py-2 border border-slate-200 rounded-lg text-slate-900 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all bg-white resize-none"
+                            value={formData.observaciones}
+                            onChange={(e) => setFormData({ ...formData, observaciones: e.target.value })}
+                        />
+                    </div>
                 </div>
 
                 <div className="flex gap-3 pt-4 border-t border-slate-100">
@@ -300,10 +331,15 @@ export function RegistrarSalidaModal({ isOpen, onClose, onSuccess }: RegistrarSa
                     </button>
                     <button
                         type="submit"
-                        disabled={!!(loading || !formData.material || !formData.cantidad || (selectedStockItem && parseInt(formData.cantidad) > selectedStockItem.cantidad))}
-                        className="flex-1 px-4 py-2 bg-rose-600 text-white rounded-lg font-semibold hover:bg-rose-700 transition-all flex items-center justify-center gap-2 disabled:opacity-50 shadow-sm"
+                        disabled={loading || !formData.material || !formData.cantidad || !formData.bodega_destino || !!(selectedStockItem && parseInt(formData.cantidad) > selectedStockItem.cantidad)}
+                        className="flex-1 px-4 py-2 bg-orange-600 text-white rounded-lg font-semibold hover:bg-orange-700 transition-all flex items-center justify-center gap-2 disabled:opacity-50 shadow-sm"
                     >
-                        {loading ? 'Procesando...' : 'Registrar Salida'}
+                        {loading ? 'Procesando...' : (
+                            <>
+                                <ArrowRightLeft className="w-4 h-4" />
+                                Confirmar Traslado
+                            </>
+                        )}
                     </button>
                 </div>
             </form>

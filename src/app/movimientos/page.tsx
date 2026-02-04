@@ -9,7 +9,8 @@ import {
     ArrowDownLeft,
     RefreshCw,
     AlertCircle,
-    RotateCcw
+    RotateCcw,
+    ArrowRightLeft
 } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import api from '@/lib/api';
@@ -18,6 +19,7 @@ import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { RegistrarEntradaModal } from '@/components/RegistrarEntradaModal';
 import { RegistrarSalidaModal } from '@/components/RegistrarSalidaModal';
+import { RegistrarTrasladoModal } from '@/components/RegistrarTrasladoModal';
 
 export default function MovimientosPage() {
     const [movimientos, setMovimientos] = useState<Movimiento[]>([]);
@@ -25,6 +27,7 @@ export default function MovimientosPage() {
     const [search, setSearch] = useState('');
     const [isEntradaOpen, setIsEntradaOpen] = useState(false);
     const [isSalidaOpen, setIsSalidaOpen] = useState(false);
+    const [isTrasladoOpen, setIsTrasladoOpen] = useState(false);
 
     const fetchMovimientos = async () => {
         setLoading(true);
@@ -46,6 +49,7 @@ export default function MovimientosPage() {
         switch (tipo) {
             case 'Entrada': return <Badge variant="success">Entrada</Badge>;
             case 'Salida': return <Badge variant="danger">Salida</Badge>;
+            case 'Traslado': return <Badge variant="info">Traslado</Badge>;
             case 'Edicion': return <Badge variant="info">Edición</Badge>;
             case 'Ajuste': return <Badge variant="neutral">Ajuste</Badge>;
             case 'Devolucion': return <Badge variant="warning">Devolución</Badge>;
@@ -79,6 +83,13 @@ export default function MovimientosPage() {
                     >
                         <Plus className="w-5 h-5" />
                         Registrar Salida
+                    </button>
+                    <button
+                        onClick={() => setIsTrasladoOpen(true)}
+                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-all shadow-sm"
+                    >
+                        <ArrowRightLeft className="w-5 h-5" />
+                        Traslado entre Bodegas
                     </button>
                 </div>
             </header>
@@ -122,6 +133,7 @@ export default function MovimientosPage() {
                                 <th className="px-6 py-4">Factura</th>
                                 <th className="px-6 py-4">Bodega</th>
                                 <th className="px-6 py-4">Fecha</th>
+                                <th className="px-6 py-4">Usuario</th>
                                 <th className="px-6 py-4">Observaciones</th>
                                 <th className="px-6 py-4 text-center">Tipo</th>
                             </tr>
@@ -153,9 +165,29 @@ export default function MovimientosPage() {
                                         <td className="px-6 py-4 text-slate-500 font-medium">
                                             {mov.factura_manual || mov.factura_info?.numero || '-'}
                                         </td>
-                                        <td className="px-6 py-4 text-slate-500">{mov.bodega_info.nombre}</td>
+                                        <td className="px-6 py-4 text-slate-500">
+                                            {mov.tipo === 'Traslado' ? (
+                                                <div className="flex items-center gap-1.5">
+                                                    <span className="font-semibold text-slate-700">{mov.bodega_info.nombre}</span>
+                                                    <ArrowRightLeft className="w-3 h-3 text-slate-400" />
+                                                    <span className="font-semibold text-blue-600">{mov.bodega_destino_info?.nombre}</span>
+                                                </div>
+                                            ) : (
+                                                mov.bodega_info.nombre
+                                            )}
+                                        </td>
                                         <td className="px-6 py-4 text-slate-500">
                                             {format(new Date(mov.fecha), 'd/L/yyyy', { locale: es })}
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className="flex flex-col">
+                                                <span className="text-xs font-semibold text-slate-700">
+                                                    {mov.usuario_info?.first_name} {mov.usuario_info?.last_name}
+                                                </span>
+                                                <span className="text-[10px] text-slate-400 font-medium lowercase">
+                                                    @{mov.usuario_info?.username || 'sistema'}
+                                                </span>
+                                            </div>
                                         </td>
                                         <td className="px-6 py-4 text-slate-500 max-w-[200px] truncate" title={mov.observaciones}>
                                             {mov.observaciones || '-'}
@@ -179,6 +211,11 @@ export default function MovimientosPage() {
             <RegistrarSalidaModal
                 isOpen={isSalidaOpen}
                 onClose={() => setIsSalidaOpen(false)}
+                onSuccess={fetchMovimientos}
+            />
+            <RegistrarTrasladoModal
+                isOpen={isTrasladoOpen}
+                onClose={() => setIsTrasladoOpen(false)}
                 onSuccess={fetchMovimientos}
             />
         </div>

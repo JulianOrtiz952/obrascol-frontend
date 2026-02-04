@@ -4,6 +4,22 @@ export interface Marca {
     activo: boolean;
 }
 
+export interface UnidadMedida {
+    id: number;
+    nombre: string;
+    abreviacion: string;
+    activo: boolean;
+}
+
+export interface User {
+    id: number;
+    username: string;
+    email: string;
+    rol: 'operario' | 'administrativo' | 'superusuario';
+    first_name: string;
+    last_name: string;
+}
+
 export interface Bodega {
     id: number;
     nombre: string;
@@ -40,7 +56,7 @@ export interface Factura {
     fecha: string;
 }
 
-export type TipoMovimiento = 'Entrada' | 'Salida' | 'Edicion' | 'Ajuste' | 'Devolucion';
+export type TipoMovimiento = 'Entrada' | 'Salida' | 'Traslado' | 'Edicion' | 'Ajuste' | 'Devolucion';
 
 export interface Movimiento {
     id: number;
@@ -48,6 +64,8 @@ export interface Movimiento {
     material_info: Material;
     bodega: number;
     bodega_info: Bodega;
+    bodega_destino?: number | null;
+    bodega_destino_info?: Bodega | null;
     factura?: number;
     factura_info?: Factura;
     cantidad: number;
@@ -58,6 +76,8 @@ export interface Movimiento {
     factura_manual?: string;
     marca?: number;
     marca_info?: Marca;
+    usuario?: number;
+    usuario_info?: User;
 }
 
 export interface ResumenInventario {
