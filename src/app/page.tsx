@@ -8,10 +8,10 @@ import Link from 'next/link';
 
 export default function Home() {
   return (
-    <div className="p-8 max-w-5xl">
-      <header className="mb-12">
-        <h1 className="text-4xl font-bold text-slate-900 mb-4">Bienvenido, Juan</h1>
-        <p className="text-xl text-slate-500">Sistema de Gestión de Inventario Obrascol</p>
+    <div className="p-4 md:p-8 max-w-5xl mx-auto">
+      <header className="mb-8 md:mb-12">
+        <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2 md:mb-4">Bienvenido, Juan</h1>
+        <p className="text-lg md:text-xl text-slate-500">Sistema de Gestión de Inventario Obrascol</p>
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -55,12 +55,12 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="mt-12 p-8 bg-orange-50 rounded-3xl border border-orange-100 flex items-center justify-between">
+      <div className="mt-8 md:mt-12 p-6 md:p-8 bg-orange-50 rounded-2xl md:rounded-3xl border border-orange-100 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div>
-          <h2 className="text-2xl font-bold text-orange-950 mb-2">¿Necesitas ayuda?</h2>
-          <p className="text-orange-800/80">Consulta la documentación del sistema o contacta a soporte técnico.</p>
+          <h2 className="text-xl md:text-2xl font-bold text-orange-950 mb-2">¿Necesitas ayuda?</h2>
+          <p className="text-orange-800/80 text-sm md:text-base">Consulta la documentación del sistema o contacta a soporte técnico.</p>
         </div>
-        <button className="px-6 py-3 bg-orange-600 text-white rounded-xl font-bold hover:bg-orange-700 transition-all shadow-lg shadow-orange-600/20">
+        <button className="w-full md:w-auto px-6 py-3 bg-orange-600 text-white rounded-xl font-bold hover:bg-orange-700 transition-all shadow-lg shadow-orange-600/20">
           Soporte
         </button>
       </div>

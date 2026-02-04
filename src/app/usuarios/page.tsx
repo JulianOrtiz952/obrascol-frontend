@@ -84,28 +84,28 @@ export default function UsuariosPage() {
     }
 
     return (
-        <div className="p-8">
-            <header className="mb-8 flex flex-wrap items-center justify-between gap-4">
+        <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-6 md:space-y-8">
+            <header className="mb-6 md:mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-extrabold text-slate-900 mb-2">Gestión de Usuarios</h1>
-                    <p className="text-slate-500">Administra los accesos y roles de la plataforma</p>
+                    <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 mb-1 md:mb-2">Gestión de Usuarios</h1>
+                    <p className="text-sm md:text-base text-slate-500">Administra los accesos y roles de la plataforma</p>
                 </div>
                 <button
                     onClick={() => setIsModalOpen(true)}
-                    className="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/10"
+                    className="flex items-center justify-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/10 text-sm md:text-base"
                 >
                     <UserPlus className="w-5 h-5" />
                     Nuevo Usuario
                 </button>
             </header>
 
-            <div className="mb-6 flex flex-wrap gap-4 items-center justify-between bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
-                <div className="relative flex-1 min-w-[300px]">
+            <div className="mb-4 md:mb-6 flex flex-col sm:flex-row gap-3 md:gap-4 items-stretch sm:items-center justify-between bg-white p-3 md:p-4 rounded-xl md:rounded-2xl border border-slate-100 shadow-sm">
+                <div className="relative flex-1">
                     <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                     <input
                         type="text"
-                        placeholder="Buscar por nombre o usuario..."
-                        className="w-full pl-12 pr-4 py-2 bg-slate-50 border border-slate-100 rounded-xl text-slate-900 focus:outline-none focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 transition-all"
+                        placeholder="Buscar..."
+                        className="w-full pl-12 pr-4 py-2 bg-slate-50 border border-slate-100 rounded-xl text-slate-900 focus:outline-none focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 transition-all text-sm md:text-base"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                     />

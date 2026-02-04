@@ -41,20 +41,20 @@ export function Modal({ isOpen, onClose, title, children, size = '2xl', secondar
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: 20 }}
                             className={cn(
-                                "relative w-full bg-white rounded-2xl shadow-2xl overflow-hidden",
+                                "relative w-full bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]",
                                 sizeClasses[size]
                             )}
                         >
-                            <header className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-                                <h2 className="text-xl font-bold text-slate-900">{title}</h2>
+                            <header className="px-4 md:px-6 py-3 md:py-4 border-b border-slate-100 flex items-center justify-between bg-white shrink-0">
+                                <h2 className="text-lg md:text-xl font-bold text-slate-900 line-clamp-1">{title}</h2>
                                 <button
                                     onClick={onClose}
-                                    className="p-2 hover:bg-slate-200 rounded-lg transition-colors text-slate-500"
+                                    className="p-1.5 md:p-2 hover:bg-slate-100 rounded-lg transition-colors text-slate-500"
                                 >
                                     <X className="w-5 h-5" />
                                 </button>
                             </header>
-                            <div className="p-6">
+                            <div className="p-4 md:p-6 overflow-y-auto custom-scrollbar">
                                 {children}
                             </div>
                         </motion.div>

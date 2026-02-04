@@ -51,27 +51,27 @@ export default function InventarioPage() {
     );
 
     return (
-        <div className="p-8">
-            <header className="mb-8">
+        <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-6">
+            <header className="mb-6 md:mb-8">
                 <div className="flex items-center gap-3 mb-2">
                     <Box className="w-8 h-8 text-orange-500" />
-                    <h1 className="text-3xl font-bold text-slate-900">Inventario</h1>
+                    <h1 className="text-2xl md:text-3xl font-bold text-slate-900">Inventario</h1>
                 </div>
-                <p className="text-slate-500">Consulta y gestiona el stock de productos disponibles</p>
+                <p className="text-sm md:text-base text-slate-500">Consulta y gestiona el stock de productos disponibles</p>
             </header>
 
             <section className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                <div className="p-4 border-b border-slate-100 bg-slate-50/50 flex flex-wrap gap-4 items-center justify-between">
+                <div className="p-3 md:p-4 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row gap-3 md:gap-4 items-stretch sm:items-center">
                     <div className="flex gap-2 items-center text-slate-600 text-sm font-medium">
                         <Filter className="w-4 h-4" />
                         Filtros
                     </div>
-                    <div className="flex flex-1 min-w-[300px] gap-2">
+                    <div className="flex flex-1 flex-col sm:flex-row gap-2">
                         <div className="relative flex-1">
                             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                             <input
                                 type="text"
-                                placeholder="Buscar por código, referencia o nombre..."
+                                placeholder="Buscar..."
                                 className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}

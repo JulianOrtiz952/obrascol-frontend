@@ -106,15 +106,15 @@ export default function UnidadesPage() {
     if (loading) return <div className="p-8 text-center text-slate-500">Cargando unidades de medida...</div>;
 
     return (
-        <div className="p-8 max-w-6xl mx-auto">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div className="p-4 md:p-8 max-w-6xl mx-auto space-y-6 md:space-y-8">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-800">Unidades de Medida</h1>
-                    <p className="text-slate-500 mt-1">Gestiona las unidades utilizadas para los materiales</p>
+                    <h1 className="text-2xl md:text-3xl font-bold text-slate-800">Unidades de Medida</h1>
+                    <p className="text-sm md:text-base text-slate-500 mt-1">Gestiona las unidades utilizadas para los materiales</p>
                 </div>
                 <button
                     onClick={handleOpenCreate}
-                    className="flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg font-semibold hover:bg-orange-700 transition-colors shadow-sm"
+                    className="flex items-center justify-center gap-2 px-4 py-2.5 bg-orange-600 text-white rounded-xl font-semibold hover:bg-orange-700 transition-colors shadow-sm text-sm"
                 >
                     <Plus className="w-5 h-5" />
                     Nueva Unidad
@@ -123,13 +123,13 @@ export default function UnidadesPage() {
 
             <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                 {/* Filters */}
-                <div className="p-4 border-b border-slate-200 bg-slate-50 flex items-center gap-4">
-                    <div className="relative flex-1 max-w-md">
+                <div className="p-3 md:p-4 border-b border-slate-200 bg-slate-50">
+                    <div className="relative w-full sm:max-w-md">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                         <input
                             type="text"
-                            placeholder="Buscar unidad o abreviación..."
-                            className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+                            placeholder="Buscar..."
+                            className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />

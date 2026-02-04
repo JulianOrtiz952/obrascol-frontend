@@ -67,11 +67,11 @@ export default function MaterialesPage() {
     });
 
     return (
-        <div className="p-8 max-w-7xl mx-auto space-y-8">
-            <div className="flex items-center justify-between">
+        <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-6 md:space-y-8">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Gestión de Productos</h1>
-                    <p className="text-slate-500 mt-2 text-lg">Administra el catálogo completo de materiales y productos.</p>
+                    <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Gestión de Productos</h1>
+                    <p className="text-slate-500 mt-1 md:mt-2 text-sm md:text-lg">Administra el catálogo completo de materiales.</p>
                 </div>
                 {/* 
                 <button 
@@ -84,23 +84,21 @@ export default function MaterialesPage() {
                 */}
             </div>
 
-            {/* Filters */}
-            <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-wrap gap-4 items-center justify-between">
-                <div className="relative flex-1 min-w-[300px]">
+            <div className="bg-white p-3 md:p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col sm:flex-row gap-3 md:gap-4 items-stretch sm:items-center">
+                <div className="relative flex-1">
                     <Search className="w-5 h-5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                     <input
                         type="text"
-                        placeholder="Buscar por nombre, código o barras..."
-                        className="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
+                        placeholder="Buscar productos..."
+                        className="w-full pl-10 pr-4 py-2 text-sm md:text-base rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
-
-                <div className="flex items-center gap-2 min-w-[200px]">
-                    <Filter className="w-4 h-4 text-slate-500" />
+                +
+                <div className="flex items-center gap-2 min-w-[160px] md:min-w-[200px]">
                     <select
-                        className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 text-slate-700 bg-white"
+                        className="w-full px-3 py-2 text-sm md:text-base rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 text-slate-700 bg-white"
                         value={selectedMarca}
                         onChange={(e) => setSelectedMarca(e.target.value)}
                     >

@@ -21,7 +21,6 @@ const navItems = [
     { name: 'Inventario', icon: Package, href: '/inventario' },
     { name: 'Productos', icon: PackageSearch, href: '/materiales' },
     { name: 'Bodegas', icon: MapPin, href: '/bodegas' },
-    { name: 'Diccionario', icon: Book, href: '/diccionario' },
 ];
 
 export function Sidebar() {
