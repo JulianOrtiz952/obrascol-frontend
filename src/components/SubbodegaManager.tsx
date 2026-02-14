@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit2, Power, PowerOff, Save, X } from 'lucide-react';
+import { Plus, Edit2, Power, PowerOff, Save, X, Eye } from 'lucide-react';
 import { Subbodega } from '@/types';
 import { subbodegas } from '@/lib/api';
+import SubbodegaStockModal from './SubbodegaStockModal';
 
 interface SubbodegaManagerProps {
     bodegaId: number;
@@ -17,6 +18,7 @@ export default function SubbodegaManager({ bodegaId, onUpdate }: SubbodegaManage
     const [editingId, setEditingId] = useState<number | null>(null);
     const [editName, setEditName] = useState('');
     const [isCreating, setIsCreating] = useState(false);
+    const [viewingStock, setViewingStock] = useState<Subbodega | null>(null);
 
     useEffect(() => {
         fetchSubbodegas();
@@ -143,6 +145,13 @@ export default function SubbodegaManager({ bodegaId, onUpdate }: SubbodegaManage
                                     </div>
                                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                         <button
+                                            onClick={() => setViewingStock(sub)}
+                                            className="p-1 text-slate-400 hover:text-blue-600 hover:bg-white rounded transition-colors"
+                                            title="Ver stock"
+                                        >
+                                            <Eye className="w-3.5 h-3.5" />
+                                        </button>
+                                        <button
                                             onClick={() => {
                                                 setEditingId(sub.id);
                                                 setEditName(sub.nombre);
@@ -164,6 +173,16 @@ export default function SubbodegaManager({ bodegaId, onUpdate }: SubbodegaManage
                     ))
                 )}
             </div>
+
+            {viewingStock && (
+                <SubbodegaStockModal
+                    isOpen={!!viewingStock}
+                    onClose={() => setViewingStock(null)}
+                    subbodegaName={viewingStock.nombre}
+                    subbodegaId={viewingStock.id}
+                    bodegaId={bodegaId}
+                />
+            )}
         </div>
     );
 }
