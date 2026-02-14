@@ -26,6 +26,7 @@ export function RegistrarEntradaModal({ isOpen, onClose, onSuccess }: RegistrarE
         referencia: '',
         nombre: '',
         bodega: '',
+        subbodega: '',
         marca: '',
         factura_manual: '',
         cantidad: '',
@@ -242,6 +243,7 @@ export function RegistrarEntradaModal({ isOpen, onClose, onSuccess }: RegistrarE
             await api.post('movimientos/', {
                 material: materialId,
                 bodega: formData.bodega,
+                subbodega: formData.subbodega || null,
                 factura_manual: formData.factura_manual,
                 marca: finalMarcaId || null,
                 cantidad: parseInt(formData.cantidad),
@@ -257,6 +259,7 @@ export function RegistrarEntradaModal({ isOpen, onClose, onSuccess }: RegistrarE
             setFormData({
                 barcode: '', materialId: '', codigo: '', referencia: '', nombre: '',
                 bodega: formData.bodega, // Keep bodega for convenience
+                subbodega: '',
                 marca: '',
                 factura_manual: '', cantidad: '', unidad: 'pcs',
                 fecha: new Date().toISOString().split('T')[0],
@@ -458,11 +461,27 @@ export function RegistrarEntradaModal({ isOpen, onClose, onSuccess }: RegistrarE
                             required
                             className="w-full px-4 py-2 bg-slate-100 border border-slate-200 rounded-lg text-slate-900 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all"
                             value={formData.bodega}
-                            onChange={(e) => setFormData({ ...formData, bodega: e.target.value })}
+                            onChange={(e) => setFormData({ ...formData, bodega: e.target.value, subbodega: '' })}
                         >
                             <option value="">Seleccionar bodega</option>
                             {bodegas.map(b => (
                                 <option key={b.id} value={b.id}>{b.nombre}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="space-y-1.5">
+                        <label className="text-sm font-semibold text-slate-700">Ubicación (Subbodega) *</label>
+                        <select
+                            required
+                            className="w-full px-4 py-2 bg-slate-100 border border-slate-200 rounded-lg text-slate-900 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all"
+                            value={formData.subbodega}
+                            onChange={(e) => setFormData({ ...formData, subbodega: e.target.value })}
+                            disabled={!formData.bodega}
+                        >
+                            <option value="">Seleccionar ubicación...</option>
+                            {bodegas.find(b => b.id.toString() === formData.bodega)?.subbodegas?.map(sb => (
+                                <option key={sb.id} value={sb.id}>{sb.nombre}</option>
                             ))}
                         </select>
                     </div>

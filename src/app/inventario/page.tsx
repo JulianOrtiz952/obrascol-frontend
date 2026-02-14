@@ -113,12 +113,17 @@ export default function InventarioPage() {
                                 </tr>
                             ) : (
                                 filteredInventario.map((item, idx) => (
-                                    <tr key={`${item.id_material}-${item.id_bodega}-${idx}`} className="hover:bg-slate-50/80 transition-all cursor-default group">
+                                    <tr key={`${item.id_material}-${item.id_bodega}-${item.id_subbodega || 0}-${idx}`} className="hover:bg-slate-50/80 transition-all cursor-default group">
                                         <td className="px-6 py-4 font-medium text-slate-700">{item.codigo}</td>
                                         <td className="px-6 py-4 text-slate-500">{item.referencia || '-'}</td>
                                         <td className="px-6 py-4 text-slate-900 font-medium">{item.nombre}</td>
                                         <td className="px-6 py-4 text-slate-700 font-semibold">{item.cantidad} {item.unidad}</td>
-                                        <td className="px-6 py-4 text-slate-500">{item.bodega}</td>
+                                        <td className="px-6 py-4 text-slate-500">
+                                            {item.bodega}
+                                            {item.subbodega && (
+                                                <span className="block text-[10px] text-slate-400 italic">{item.subbodega}</span>
+                                            )}
+                                        </td>
                                         <td className="px-6 py-4 text-center">
                                             {getEstadoBadge(item.estado)}
                                         </td>

@@ -8,11 +8,13 @@ import { Badge } from '@/components/ui/Badge';
 import CreateBodegaModal from '@/components/CreateBodegaModal';
 import EditBodegaModal from '@/components/EditBodegaModal';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
+import SubbodegaManager from '@/components/SubbodegaManager';
 
 export default function BodegasPage() {
     const [bodegasList, setBodegasList] = useState<Bodega[]>([]);
     const [selectedBodega, setSelectedBodega] = useState<Bodega | null>(null);
     const [stock, setStock] = useState<BodegaStock[]>([]);
+    const [activeTab, setActiveTab] = useState<'stock' | 'locations'>('stock');
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [incluirInactivas, setIncluirInactivas] = useState(false);
@@ -27,6 +29,14 @@ export default function BodegasPage() {
         bodega: null
     });
 
+    // Group stock by subbodega
+    const stockBySubbodega = stock.reduce((acc, item) => {
+        const subName = item.subbodega_nombre || 'General';
+        if (!acc[subName]) acc[subName] = [];
+        acc[subName].push(item);
+        return acc;
+    }, {} as Record<string, BodegaStock[]>);
+
     useEffect(() => {
         fetchBodegas();
     }, [incluirInactivas]);
@@ -36,6 +46,12 @@ export default function BodegasPage() {
             setLoading(true);
             const response = await bodegas.getAll(incluirInactivas);
             setBodegasList(response.data);
+
+            // Re-select bodega to update its subbodegas/info if it was selected
+            if (selectedBodega) {
+                const updated = response.data.find(b => b.id === selectedBodega.id);
+                if (updated) setSelectedBodega(updated);
+            }
         } catch (error) {
             console.error('Error fetching bodegas:', error);
         } finally {
@@ -58,6 +74,7 @@ export default function BodegasPage() {
             setStock([]);
         } else {
             setSelectedBodega(bodega);
+            setActiveTab('stock');
             await fetchStock(bodega.id);
         }
     };
@@ -141,7 +158,7 @@ export default function BodegasPage() {
                         <div
                             key={bodega.id}
                             className={`bg-white border rounded-2xl shadow-sm transition-all ${selectedBodega?.id === bodega.id
-                                ? 'border-orange-500 shadow-md'
+                                ? 'border-orange-500 shadow-md ring-2 ring-orange-100'
                                 : 'border-slate-200 hover:border-slate-300'
                                 }`}
                         >
@@ -164,7 +181,7 @@ export default function BodegasPage() {
                                 <div className="flex items-center gap-2 text-sm text-slate-600 mb-4 p-3 bg-slate-50 rounded-lg">
                                     <Package className="w-4 h-4" />
                                     <span className="font-medium">{bodega.materiales_count || 0}</span>
-                                    <span>materiales en stock.</span>
+                                    <span>materiales en total.</span>
                                 </div>
 
                                 <div className="flex items-center gap-2">
@@ -172,7 +189,7 @@ export default function BodegasPage() {
                                         onClick={() => handleSelectBodega(bodega)}
                                         className="flex-1 px-4 py-2 bg-slate-100 text-slate-700 rounded-lg font-medium hover:bg-slate-200 transition-all text-sm"
                                     >
-                                        {selectedBodega?.id === bodega.id ? 'Ocultar' : 'Ver Stock'}
+                                        {selectedBodega?.id === bodega.id ? 'Ocultar' : 'Ver Detalles'}
                                     </button>
                                     <button
                                         onClick={() => handleEdit(bodega)}
@@ -195,31 +212,63 @@ export default function BodegasPage() {
                             </div>
 
                             {selectedBodega?.id === bodega.id && (
-                                <div className="border-t border-slate-200 p-6 bg-slate-50">
-                                    <h4 className="font-bold text-slate-900 mb-4">Stock de Materiales</h4>
-                                    {stock.length === 0 ? (
-                                        <p className="text-sm text-slate-500 text-center py-4">No hay materiales en stock</p>
-                                    ) : (
-                                        <div className="space-y-2 max-h-64 overflow-y-auto">
-                                            {stock.map((item) => (
-                                                <div
-                                                    key={item.id_material}
-                                                    className="flex items-center justify-between p-3 bg-white rounded-lg border border-slate-200"
-                                                >
-                                                    <div className="flex-1">
-                                                        <p className="font-medium text-slate-900 text-sm">{item.nombre}</p>
-                                                        <p className="text-xs text-slate-500">
-                                                            {item.codigo}
-                                                            {item.referencia && ` • ${item.referencia}`}
-                                                        </p>
+                                <div className="border-t border-slate-200 p-6 bg-slate-50 rounded-b-2xl">
+                                    {/* Tabs for details */}
+                                    <div className="flex border-b border-slate-200 mb-4">
+                                        <button
+                                            onClick={() => setActiveTab('stock')}
+                                            className={`flex-1 py-2 text-sm font-bold border-b-2 transition-colors ${activeTab === 'stock' ? 'border-orange-500 text-orange-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
+                                        >
+                                            Stock por Ubicación
+                                        </button>
+                                        <button
+                                            onClick={() => setActiveTab('locations')}
+                                            className={`flex-1 py-2 text-sm font-bold border-b-2 transition-colors ${activeTab === 'locations' ? 'border-orange-500 text-orange-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
+                                        >
+                                            Ubicaciones
+                                        </button>
+                                    </div>
+
+                                    {activeTab === 'stock' ? (
+                                        <div className="space-y-6">
+                                            {Object.keys(stockBySubbodega).length === 0 ? (
+                                                <p className="text-sm text-slate-500 text-center py-4">No hay materiales en stock</p>
+                                            ) : (
+                                                Object.entries(stockBySubbodega).map(([subName, items]) => (
+                                                    <div key={subName} className="space-y-2">
+                                                        <h5 className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
+                                                            {subName}
+                                                            <span className="bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded text-[10px]">{items.length}</span>
+                                                        </h5>
+                                                        <div className="space-y-2">
+                                                            {items.map((item) => (
+                                                                <div
+                                                                    key={`${item.id_material}-${item.id_subbodega}`}
+                                                                    className="flex items-center justify-between p-3 bg-white rounded-lg border border-slate-200"
+                                                                >
+                                                                    <div className="flex-1">
+                                                                        <p className="font-medium text-slate-900 text-sm">{item.nombre}</p>
+                                                                        <p className="text-xs text-slate-500">
+                                                                            {item.codigo}
+                                                                            {item.referencia && ` • ${item.referencia}`}
+                                                                        </p>
+                                                                    </div>
+                                                                    <div className="text-right">
+                                                                        <p className="font-bold text-slate-900">{item.cantidad}</p>
+                                                                        <p className="text-xs text-slate-500">{item.unidad}</p>
+                                                                    </div>
+                                                                </div>
+                                                            ))}
+                                                        </div>
                                                     </div>
-                                                    <div className="text-right">
-                                                        <p className="font-bold text-slate-900">{item.cantidad}</p>
-                                                        <p className="text-xs text-slate-500">{item.unidad}</p>
-                                                    </div>
-                                                </div>
-                                            ))}
+                                                ))
+                                            )}
                                         </div>
+                                    ) : (
+                                        <SubbodegaManager
+                                            bodegaId={bodega.id}
+                                            onUpdate={fetchBodegas}
+                                        />
                                     )}
                                 </div>
                             )}

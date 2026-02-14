@@ -13,6 +13,8 @@ interface StockItem {
     nombre: string;
     cantidad: number;
     unidad: string;
+    id_subbodega?: number;
+    subbodega_nombre?: string;
 }
 
 interface RegistrarSalidaModalProps {
@@ -29,6 +31,7 @@ export function RegistrarSalidaModal({ isOpen, onClose, onSuccess }: RegistrarSa
     const [formData, setFormData] = useState({
         material: '',
         bodega: '',
+        subbodega: '',
         cantidad: '',
     });
 
@@ -59,7 +62,7 @@ export function RegistrarSalidaModal({ isOpen, onClose, onSuccess }: RegistrarSa
     };
 
     const handleBodegaChange = async (id: string) => {
-        setFormData(prev => ({ ...prev, bodega: id, material: '' }));
+        setFormData(prev => ({ ...prev, bodega: id, subbodega: '', material: '' }));
         setSelectedStockItem(null);
         setAvailableStock([]);
 
@@ -95,10 +98,10 @@ export function RegistrarSalidaModal({ isOpen, onClose, onSuccess }: RegistrarSa
         }
     };
 
-    const handleMaterialManualSelect = (id: string) => {
-        const item = availableStock.find(s => s.id_material.toString() === id);
+    const handleMaterialManualSelect = (id: string, subId?: number) => {
+        const item = availableStock.find(s => s.id_material.toString() === id && s.id_subbodega === subId);
         setSelectedStockItem(item || null);
-        setFormData(prev => ({ ...prev, material: id }));
+        setFormData(prev => ({ ...prev, material: id, subbodega: subId?.toString() || '' }));
         if (item) setSearchValue(item.codigo);
     };
 
@@ -115,6 +118,7 @@ export function RegistrarSalidaModal({ isOpen, onClose, onSuccess }: RegistrarSa
             await api.post('movimientos/', {
                 material: formData.material,
                 bodega: formData.bodega,
+                subbodega: formData.subbodega || null,
                 cantidad: parseInt(formData.cantidad),
                 precio: null,
                 tipo: 'Salida'
@@ -122,7 +126,7 @@ export function RegistrarSalidaModal({ isOpen, onClose, onSuccess }: RegistrarSa
 
             onSuccess();
             onClose();
-            setFormData({ material: '', bodega: '', cantidad: '' });
+            setFormData({ material: '', bodega: '', subbodega: '', cantidad: '' });
             setSelectedStockItem(null);
         } catch (err: any) {
             console.error('Error submitting movement:', err);
@@ -139,7 +143,7 @@ export function RegistrarSalidaModal({ isOpen, onClose, onSuccess }: RegistrarSa
 
             <form onSubmit={handleSubmit} className="space-y-3.5">
                 <div className="grid grid-cols-2 gap-x-4 gap-y-3">
-                    <div className="col-span-2 space-y-1.5">
+                    <div className="space-y-1.5">
                         <label className="text-sm font-semibold text-slate-700">Bodega de Origen *</label>
                         <select
                             required
@@ -150,6 +154,25 @@ export function RegistrarSalidaModal({ isOpen, onClose, onSuccess }: RegistrarSa
                             <option value="" className="text-slate-400">Seleccione bodega...</option>
                             {bodegas.map(b => (
                                 <option key={b.id} value={b.id} className="text-slate-900">{b.nombre}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="space-y-1.5">
+                        <label className="text-sm font-semibold text-slate-700">Ubicación (Subbodega)</label>
+                        <select
+                            className="w-full px-4 py-2 border border-slate-200 rounded-lg text-slate-900 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none transition-all bg-white"
+                            value={formData.subbodega}
+                            onChange={(e) => {
+                                const subId = e.target.value;
+                                setFormData(prev => ({ ...prev, subbodega: subId, material: '' }));
+                                setSelectedStockItem(null);
+                            }}
+                            disabled={!formData.bodega}
+                        >
+                            <option value="">Todas las ubicaciones</option>
+                            {bodegas.find(b => b.id.toString() === formData.bodega)?.subbodegas?.map(sb => (
+                                <option key={sb.id} value={sb.id}>{sb.nombre}</option>
                             ))}
                         </select>
                     </div>
@@ -210,16 +233,18 @@ export function RegistrarSalidaModal({ isOpen, onClose, onSuccess }: RegistrarSa
                             {searchValue && !selectedStockItem && !fetchingStock && formData.bodega && (
                                 <div className="mt-2 p-2 bg-white border border-slate-100 rounded-lg shadow-sm max-h-40 overflow-y-auto space-y-1 z-10 relative">
                                     {availableStock
-                                        .filter(s =>
-                                            searchType === 'barcode' ? s.codigo.toLowerCase().includes(searchValue.toLowerCase()) :
+                                        .filter(s => {
+                                            const matchesSearch = searchType === 'barcode' ? s.codigo.toLowerCase().includes(searchValue.toLowerCase()) :
                                                 searchType === 'reference' ? (s.referencia?.toLowerCase() || '').includes(searchValue.toLowerCase()) :
-                                                    s.nombre.toLowerCase().includes(searchValue.toLowerCase())
-                                        )
+                                                    s.nombre.toLowerCase().includes(searchValue.toLowerCase());
+                                            const matchesSubbodega = !formData.subbodega || s.id_subbodega?.toString() === formData.subbodega;
+                                            return matchesSearch && matchesSubbodega;
+                                        })
                                         .map(s => (
                                             <button
-                                                key={s.id_material}
+                                                key={`${s.id_material}-${s.id_subbodega}`}
                                                 type="button"
-                                                onClick={() => handleMaterialManualSelect(s.id_material.toString())}
+                                                onClick={() => handleMaterialManualSelect(s.id_material.toString(), s.id_subbodega)}
                                                 className="w-full text-left px-3 py-2 text-sm hover:bg-slate-50 rounded-md transition-colors border border-transparent hover:border-slate-100"
                                             >
                                                 <div className="flex justify-between items-center">
@@ -227,7 +252,9 @@ export function RegistrarSalidaModal({ isOpen, onClose, onSuccess }: RegistrarSa
                                                     <span className="text-[10px] text-slate-400 font-mono">{s.codigo}</span>
                                                 </div>
                                                 <div className="flex justify-between items-center mt-1">
-                                                    <span className="text-[10px] text-slate-500 italic">Ref: {s.referencia || '-'}</span>
+                                                    <span className="text-[10px] text-slate-500 italic">
+                                                        {s.subbodega_nombre || 'General'} | Ref: {s.referencia || '-'}
+                                                    </span>
                                                     <span className="text-[10px] bg-emerald-50 text-emerald-700 px-1.5 rounded font-bold">Stock: {s.cantidad}</span>
                                                 </div>
                                             </button>

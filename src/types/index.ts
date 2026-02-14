@@ -20,12 +20,20 @@ export interface User {
     last_name: string;
 }
 
+export interface Subbodega {
+    id: number;
+    nombre: string;
+    bodega: number;
+    activo: boolean;
+}
+
 export interface Bodega {
     id: number;
     nombre: string;
     ubicacion: string;
     activo: boolean;
     materiales_count?: number;
+    subbodegas?: Subbodega[];
 }
 
 export interface BodegaStock {
@@ -35,6 +43,8 @@ export interface BodegaStock {
     nombre: string;
     cantidad: number;
     unidad: string;
+    id_subbodega?: number | null;
+    subbodega_nombre?: string;
 }
 
 export interface Material {
@@ -64,8 +74,12 @@ export interface Movimiento {
     material_info: Material;
     bodega: number;
     bodega_info: Bodega;
+    subbodega?: number | null;
+    subbodega_info?: Subbodega | null;
     bodega_destino?: number | null;
     bodega_destino_info?: Bodega | null;
+    subbodega_destino?: number | null;
+    subbodega_destino_info?: Subbodega | null;
     factura?: number;
     factura_info?: Factura;
     cantidad: number;
@@ -87,6 +101,8 @@ export interface ResumenInventario {
     nombre: string;
     id_bodega: number;
     bodega: string;
+    id_subbodega?: number | null;
+    subbodega?: string;
     cantidad: number;
     unidad: string;
     estado: 'Alto' | 'Medio' | 'Bajo';

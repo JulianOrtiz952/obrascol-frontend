@@ -20,7 +20,9 @@ export function RegistrarTrasladoModal({ isOpen, onClose, onSuccess }: Registrar
     const [formData, setFormData] = useState({
         material: '',
         bodega_origen: '',
+        subbodega_origen: '',
         bodega_destino: '',
+        subbodega_destino: '',
         cantidad: '',
         observaciones: '',
     });
@@ -52,7 +54,7 @@ export function RegistrarTrasladoModal({ isOpen, onClose, onSuccess }: Registrar
     };
 
     const handleBodegaOrigenChange = async (id: string) => {
-        setFormData(prev => ({ ...prev, bodega_origen: id, material: '' }));
+        setFormData(prev => ({ ...prev, bodega_origen: id, subbodega_origen: '', material: '' }));
         setSelectedStockItem(null);
         setAvailableStock([]);
 
@@ -88,18 +90,18 @@ export function RegistrarTrasladoModal({ isOpen, onClose, onSuccess }: Registrar
         }
     };
 
-    const handleMaterialManualSelect = (id: string) => {
-        const item = availableStock.find(s => s.id_material.toString() === id);
+    const handleMaterialManualSelect = (id: string, subId?: number | null) => {
+        const item = availableStock.find(s => s.id_material.toString() === id && s.id_subbodega === subId);
         setSelectedStockItem(item || null);
-        setFormData(prev => ({ ...prev, material: id }));
+        setFormData(prev => ({ ...prev, material: id, subbodega_origen: subId?.toString() || '' }));
         if (item) setSearchValue(item.codigo);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (formData.bodega_origen === formData.bodega_destino) {
-            alert('La bodega de destino debe ser diferente a la de origen.');
+        if (formData.bodega_origen === formData.bodega_destino && formData.subbodega_origen === formData.subbodega_destino) {
+            alert('La ubicación de destino debe ser diferente a la de origen.');
             return;
         }
 
@@ -113,7 +115,9 @@ export function RegistrarTrasladoModal({ isOpen, onClose, onSuccess }: Registrar
             await api.post('movimientos/', {
                 material: formData.material,
                 bodega: formData.bodega_origen,
+                subbodega: formData.subbodega_origen || null,
                 bodega_destino: formData.bodega_destino,
+                subbodega_destino: formData.subbodega_destino || null,
                 cantidad: parseInt(formData.cantidad),
                 precio: null,
                 tipo: 'Traslado',
@@ -126,7 +130,9 @@ export function RegistrarTrasladoModal({ isOpen, onClose, onSuccess }: Registrar
             setFormData({
                 material: '',
                 bodega_origen: '',
+                subbodega_origen: '',
                 bodega_destino: '',
+                subbodega_destino: '',
                 cantidad: '',
                 observaciones: ''
             });
@@ -162,21 +168,62 @@ export function RegistrarTrasladoModal({ isOpen, onClose, onSuccess }: Registrar
                     </div>
 
                     <div className="space-y-1.5">
+                        <label className="text-sm font-semibold text-slate-700">Ubicación Origen</label>
+                        <select
+                            className="w-full px-4 py-2 border border-slate-200 rounded-lg text-slate-900 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all bg-white"
+                            value={formData.subbodega_origen}
+                            onChange={(e) => {
+                                const subId = e.target.value;
+                                setFormData(prev => ({ ...prev, subbodega_origen: subId, material: '' }));
+                                setSelectedStockItem(null);
+                            }}
+                            disabled={!formData.bodega_origen}
+                        >
+                            <option value="">Todas las ubicaciones</option>
+                            {bodegas.find(b => b.id.toString() === formData.bodega_origen)?.subbodegas?.map(sb => (
+                                <option key={sb.id} value={sb.id}>{sb.nombre}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="space-y-1.5">
                         <label className="text-sm font-semibold text-slate-700">Bodega Destino *</label>
                         <select
                             required
                             className="w-full px-4 py-2 border border-slate-200 rounded-lg text-slate-900 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all bg-white"
                             value={formData.bodega_destino}
-                            onChange={(e) => setFormData({ ...formData, bodega_destino: e.target.value })}
+                            onChange={(e) => setFormData({ ...formData, bodega_destino: e.target.value, subbodega_destino: '' })}
                         >
                             <option value="">Seleccione destino...</option>
                             {bodegas.map(b => (
                                 <option
                                     key={b.id}
                                     value={b.id}
-                                    disabled={b.id.toString() === formData.bodega_origen}
+                                    disabled={b.id.toString() === formData.bodega_origen && !formData.subbodega_origen}
                                 >
-                                    {b.nombre} {b.id.toString() === formData.bodega_origen ? '(Origen)' : ''}
+                                    {b.nombre} {b.id.toString() === formData.bodega_origen ? '(Misma Bodega)' : ''}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="space-y-1.5">
+                        <label className="text-sm font-semibold text-slate-700">Ubicación Destino *</label>
+                        <select
+                            required
+                            className="w-full px-4 py-2 border border-slate-200 rounded-lg text-slate-900 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all bg-white"
+                            value={formData.subbodega_destino}
+                            onChange={(e) => setFormData({ ...formData, subbodega_destino: e.target.value })}
+                            disabled={!formData.bodega_destino}
+                        >
+                            <option value="">Seleccione ubicación...</option>
+                            {bodegas.find(b => b.id.toString() === formData.bodega_destino)?.subbodegas?.map(sb => (
+                                <option
+                                    key={sb.id}
+                                    value={sb.id}
+                                    disabled={formData.bodega_origen === formData.bodega_destino && sb.id.toString() === formData.subbodega_origen}
+                                >
+                                    {sb.nombre} {formData.bodega_origen === formData.bodega_destino && sb.id.toString() === formData.subbodega_origen ? '(Origen)' : ''}
                                 </option>
                             ))}
                         </select>
@@ -238,16 +285,18 @@ export function RegistrarTrasladoModal({ isOpen, onClose, onSuccess }: Registrar
                             {searchValue && !selectedStockItem && !fetchingStock && formData.bodega_origen && (
                                 <div className="mt-2 p-2 bg-white border border-slate-100 rounded-lg shadow-sm max-h-40 overflow-y-auto space-y-1 z-10 relative">
                                     {availableStock
-                                        .filter(s =>
-                                            searchType === 'barcode' ? s.codigo.toLowerCase().includes(searchValue.toLowerCase()) :
+                                        .filter(s => {
+                                            const matchesSearch = searchType === 'barcode' ? s.codigo.toLowerCase().includes(searchValue.toLowerCase()) :
                                                 searchType === 'reference' ? (s.referencia?.toLowerCase() || '').includes(searchValue.toLowerCase()) :
-                                                    s.nombre.toLowerCase().includes(searchValue.toLowerCase())
-                                        )
+                                                    s.nombre.toLowerCase().includes(searchValue.toLowerCase());
+                                            const matchesSubbodega = !formData.subbodega_origen || s.id_subbodega?.toString() === formData.subbodega_origen;
+                                            return matchesSearch && matchesSubbodega;
+                                        })
                                         .map(s => (
                                             <button
-                                                key={s.id_material}
+                                                key={`${s.id_material}-${s.id_subbodega}`}
                                                 type="button"
-                                                onClick={() => handleMaterialManualSelect(s.id_material.toString())}
+                                                onClick={() => handleMaterialManualSelect(s.id_material.toString(), s.id_subbodega)}
                                                 className="w-full text-left px-3 py-2 text-sm hover:bg-slate-50 rounded-md transition-colors border border-transparent hover:border-slate-100"
                                             >
                                                 <div className="flex justify-between items-center">
@@ -255,7 +304,9 @@ export function RegistrarTrasladoModal({ isOpen, onClose, onSuccess }: Registrar
                                                     <span className="text-[10px] text-slate-400 font-mono">{s.codigo}</span>
                                                 </div>
                                                 <div className="flex justify-between items-center mt-1">
-                                                    <span className="text-[10px] text-slate-500 italic">Ref: {s.referencia || '-'}</span>
+                                                    <span className="text-[10px] text-slate-500 italic">
+                                                        {s.subbodega_nombre || 'General'} | Ref: {s.referencia || '-'}
+                                                    </span>
                                                     <span className="text-[10px] bg-emerald-50 text-emerald-700 px-1.5 rounded font-bold">Stock: {s.cantidad}</span>
                                                 </div>
                                             </button>

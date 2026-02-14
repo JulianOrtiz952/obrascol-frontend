@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Bodega, BodegaStock } from '@/types';
+import { Bodega, Subbodega, BodegaStock } from '@/types';
 
 const api = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/',
@@ -54,6 +54,27 @@ export const bodegas = {
 
     getStock: (id: number) =>
         api.get<BodegaStock[]>(`bodegas/${id}/stock_actual/`),
+};
+
+// Subbodegas API
+export const subbodegas = {
+    getAll: (bodegaId?: number, incluirInactivas = false) => {
+        let url = 'subbodegas/';
+        const params = new URLSearchParams();
+        if (bodegaId) params.append('bodega', bodegaId.toString());
+        if (incluirInactivas) params.append('incluir_inactivas', 'true');
+        if (params.toString()) url += `?${params.toString()}`;
+        return api.get<Subbodega[]>(url);
+    },
+
+    create: (data: Omit<Subbodega, 'id'>) =>
+        api.post<Subbodega>('subbodegas/', data),
+
+    update: (id: number, data: Partial<Subbodega>) =>
+        api.patch<Subbodega>(`subbodegas/${id}/`, data),
+
+    toggleActivo: (id: number) =>
+        api.post<Subbodega>(`subbodegas/${id}/toggle_activo/`),
 };
 
 export default api;
