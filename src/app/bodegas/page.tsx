@@ -234,34 +234,46 @@ export default function BodegasPage() {
                                             {Object.keys(stockBySubbodega).length === 0 ? (
                                                 <p className="text-sm text-slate-500 text-center py-4">No hay materiales en stock</p>
                                             ) : (
-                                                Object.entries(stockBySubbodega).map(([subName, items]) => (
-                                                    <div key={subName} className="space-y-2">
-                                                        <h5 className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
-                                                            {subName}
-                                                            <span className="bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded text-[10px]">{items.length}</span>
-                                                        </h5>
-                                                        <div className="space-y-2">
-                                                            {items.map((item) => (
-                                                                <div
-                                                                    key={`${item.id_material}-${item.id_subbodega}`}
-                                                                    className="flex items-center justify-between p-3 bg-white rounded-lg border border-slate-200"
-                                                                >
-                                                                    <div className="flex-1">
-                                                                        <p className="font-medium text-slate-900 text-sm">{item.nombre}</p>
-                                                                        <p className="text-xs text-slate-500">
-                                                                            {item.codigo}
-                                                                            {item.referencia && ` • ${item.referencia}`}
-                                                                        </p>
-                                                                    </div>
-                                                                    <div className="text-right">
-                                                                        <p className="font-bold text-slate-900">{item.cantidad}</p>
-                                                                        <p className="text-xs text-slate-500">{item.unidad}</p>
+                                                Object.entries(stockBySubbodega)
+                                                    .sort(([a], [b]) => a.localeCompare(b))
+                                                    .map(([subName, items]) => (
+                                                        <div key={subName} className="space-y-2">
+                                                            <div className="flex items-center justify-between mb-1">
+                                                                <div className="flex items-center gap-1.5 overflow-hidden">
+                                                                    <MapPin className="w-3 h-3 text-orange-500 shrink-0" />
+                                                                    <div className="flex items-center gap-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider truncate">
+                                                                        {subName.split(' > ').map((part, idx, arr) => (
+                                                                            <React.Fragment key={idx}>
+                                                                                <span className={idx === arr.length - 1 ? 'text-slate-600' : ''}>{part}</span>
+                                                                                {idx < arr.length - 1 && <span className="text-slate-300">/</span>}
+                                                                            </React.Fragment>
+                                                                        ))}
                                                                     </div>
                                                                 </div>
-                                                            ))}
+                                                                <span className="bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded text-[10px] font-bold shrink-0">{items.length}</span>
+                                                            </div>
+                                                            <div className="grid gap-2">
+                                                                {items.map((item) => (
+                                                                    <div
+                                                                        key={`${item.id_material}-${item.id_subbodega}`}
+                                                                        className="flex items-center justify-between p-3 bg-white rounded-lg border border-slate-200 hover:border-orange-200 transition-colors shadow-sm"
+                                                                    >
+                                                                        <div className="flex-1 min-w-0 pr-4">
+                                                                            <p className="font-bold text-slate-900 text-sm truncate">{item.nombre}</p>
+                                                                            <p className="text-[10px] text-slate-500 font-mono truncate">
+                                                                                {item.codigo}
+                                                                                {item.referencia && ` • ${item.referencia}`}
+                                                                            </p>
+                                                                        </div>
+                                                                        <div className="text-right shrink-0">
+                                                                            <p className="font-black text-slate-900 text-base leading-none">{item.cantidad}</p>
+                                                                            <p className="text-[10px] text-slate-400 font-bold uppercase">{item.unidad}</p>
+                                                                        </div>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                ))
+                                                    ))
                                             )}
                                         </div>
                                     ) : (

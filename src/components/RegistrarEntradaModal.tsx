@@ -480,9 +480,14 @@ export function RegistrarEntradaModal({ isOpen, onClose, onSuccess }: RegistrarE
                             disabled={!formData.bodega}
                         >
                             <option value="">Seleccionar ubicación...</option>
-                            {bodegas.find(b => b.id.toString() === formData.bodega)?.subbodegas?.map(sb => (
-                                <option key={sb.id} value={sb.id}>{sb.nombre}</option>
-                            ))}
+                            {bodegas.find(b => b.id.toString() === formData.bodega)?.subbodegas
+                                ?.filter(sb => sb.activo)
+                                .sort((a, b) => (a.full_path || a.nombre).localeCompare(b.full_path || b.nombre))
+                                .map(sb => (
+                                    <option key={sb.id} value={sb.id}>
+                                        {sb.full_path || sb.nombre}
+                                    </option>
+                                ))}
                         </select>
                     </div>
 

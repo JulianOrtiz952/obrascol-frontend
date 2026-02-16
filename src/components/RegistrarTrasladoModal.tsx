@@ -180,9 +180,14 @@ export function RegistrarTrasladoModal({ isOpen, onClose, onSuccess }: Registrar
                             disabled={!formData.bodega_origen}
                         >
                             <option value="">Todas las ubicaciones</option>
-                            {bodegas.find(b => b.id.toString() === formData.bodega_origen)?.subbodegas?.map(sb => (
-                                <option key={sb.id} value={sb.id}>{sb.nombre}</option>
-                            ))}
+                            {bodegas.find(b => b.id.toString() === formData.bodega_origen)?.subbodegas
+                                ?.filter(sb => sb.activo)
+                                .sort((a, b) => (a.full_path || a.nombre).localeCompare(b.full_path || b.nombre))
+                                .map(sb => (
+                                    <option key={sb.id} value={sb.id}>
+                                        {sb.full_path || sb.nombre}
+                                    </option>
+                                ))}
                         </select>
                     </div>
 
@@ -217,15 +222,18 @@ export function RegistrarTrasladoModal({ isOpen, onClose, onSuccess }: Registrar
                             disabled={!formData.bodega_destino}
                         >
                             <option value="">Seleccione ubicación...</option>
-                            {bodegas.find(b => b.id.toString() === formData.bodega_destino)?.subbodegas?.map(sb => (
-                                <option
-                                    key={sb.id}
-                                    value={sb.id}
-                                    disabled={formData.bodega_origen === formData.bodega_destino && sb.id.toString() === formData.subbodega_origen}
-                                >
-                                    {sb.nombre} {formData.bodega_origen === formData.bodega_destino && sb.id.toString() === formData.subbodega_origen ? '(Origen)' : ''}
-                                </option>
-                            ))}
+                            {bodegas.find(b => b.id.toString() === formData.bodega_destino)?.subbodegas
+                                ?.filter(sb => sb.activo)
+                                .sort((a, b) => (a.full_path || a.nombre).localeCompare(b.full_path || b.nombre))
+                                .map(sb => (
+                                    <option
+                                        key={sb.id}
+                                        value={sb.id}
+                                        disabled={formData.bodega_origen === formData.bodega_destino && sb.id.toString() === formData.subbodega_origen}
+                                    >
+                                        {sb.full_path || sb.nombre} {formData.bodega_origen === formData.bodega_destino && sb.id.toString() === formData.subbodega_origen ? '(Origen)' : ''}
+                                    </option>
+                                ))}
                         </select>
                     </div>
 

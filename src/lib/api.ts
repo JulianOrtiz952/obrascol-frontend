@@ -52,17 +52,21 @@ export const bodegas = {
     toggleActivo: (id: number) =>
         api.post<Bodega>(`bodegas/${id}/toggle_activo/`),
 
-    getStock: (id: number) =>
-        api.get<BodegaStock[]>(`bodegas/${id}/stock_actual/`),
+    getStock: (id: number, subbodegaId?: number) => {
+        let url = `bodegas/${id}/stock_actual/`;
+        if (subbodegaId) url += `?subbodega=${subbodegaId}`;
+        return api.get<BodegaStock[]>(url);
+    },
 };
 
 // Subbodegas API
 export const subbodegas = {
-    getAll: (bodegaId?: number, incluirInactivas = false) => {
+    getAll: (bodegaId?: number, incluirInactivas = false, parentId?: number | 'null') => {
         let url = 'subbodegas/';
         const params = new URLSearchParams();
         if (bodegaId) params.append('bodega', bodegaId.toString());
         if (incluirInactivas) params.append('incluir_inactivas', 'true');
+        if (parentId !== undefined) params.append('parent', String(parentId));
         if (params.toString()) url += `?${params.toString()}`;
         return api.get<Subbodega[]>(url);
     },

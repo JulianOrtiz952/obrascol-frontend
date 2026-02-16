@@ -23,7 +23,9 @@ export interface User {
 export interface Subbodega {
     id: number;
     nombre: string;
+    full_path?: string;
     bodega: number;
+    parent?: number | null;
     activo: boolean;
 }
 
