@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import {
     Package,
@@ -16,7 +16,7 @@ import api, { bodegas as bodegasApi } from '@/lib/api';
 import { ResumenInventario, Bodega } from '@/types';
 import { EditMaterialModal } from '@/components/EditMaterialModal';
 
-export default function InventarioPage() {
+function InventarioContent() {
     const searchParams = useSearchParams();
     const [inventario, setInventario] = useState<ResumenInventario[]>([]);
     const [bodegas, setBodegas] = useState<Bodega[]>([]);
@@ -201,5 +201,17 @@ export default function InventarioPage() {
                 />
             )}
         </div>
+    );
+}
+
+export default function InventarioPage() {
+    return (
+        <Suspense fallback={
+            <div className="flex items-center justify-center min-h-screen bg-slate-50">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
+            </div>
+        }>
+            <InventarioContent />
+        </Suspense>
     );
 }
