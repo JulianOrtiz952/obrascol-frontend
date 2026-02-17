@@ -6,6 +6,7 @@ import { Material, Bodega, Marca, UnidadMedida } from '@/types';
 import { Modal } from './ui/Modal';
 import { Plus, Search, Check, Save, Scan, AlertCircle, Hash, Tag, Type } from 'lucide-react';
 import { UnitConversionTable } from './UnitConversionTable';
+import { SubbodegaSelector } from './SubbodegaSelector';
 
 interface RegistrarEntradaModalProps {
     isOpen: boolean;
@@ -468,25 +469,14 @@ export function RegistrarEntradaModal({ isOpen, onClose, onSuccess }: RegistrarE
                         </select>
                     </div>
 
-                    <div className="space-y-1.5">
-                        <label className="text-sm font-semibold text-slate-700">Ubicación (Subbodega) *</label>
-                        <select
+                    <div className="col-span-1">
+                        <SubbodegaSelector
+                            subbodegas={bodegas.find(b => b.id.toString() === formData.bodega)?.subbodegas || []}
+                            selectedId={formData.subbodega}
+                            onChange={(id) => setFormData({ ...formData, subbodega: id })}
                             required
-                            className="w-full px-4 py-2 bg-slate-100 border border-slate-200 rounded-lg text-slate-900 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all"
-                            value={formData.subbodega}
-                            onChange={(e) => setFormData({ ...formData, subbodega: e.target.value })}
                             disabled={!formData.bodega}
-                        >
-                            <option value="">Seleccionar ubicación...</option>
-                            {bodegas.find(b => b.id.toString() === formData.bodega)?.subbodegas
-                                ?.filter(sb => sb.activo)
-                                .sort((a, b) => (a.full_path || a.nombre).localeCompare(b.full_path || b.nombre))
-                                .map(sb => (
-                                    <option key={sb.id} value={sb.id}>
-                                        {sb.full_path || sb.nombre}
-                                    </option>
-                                ))}
-                        </select>
+                        />
                     </div>
 
                     {isNewMaterial ? (

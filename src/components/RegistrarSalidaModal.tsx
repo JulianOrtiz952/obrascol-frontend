@@ -5,6 +5,7 @@ import api from '@/lib/api';
 import { Material, Bodega } from '@/types';
 import { Modal } from './ui/Modal';
 import { Save, AlertCircle, Scan, Tag, Type, Search } from 'lucide-react';
+import { SubbodegaSelector } from './SubbodegaSelector';
 
 interface StockItem {
     id_material: number;
@@ -157,28 +158,18 @@ export function RegistrarSalidaModal({ isOpen, onClose, onSuccess }: RegistrarSa
                         </select>
                     </div>
 
-                    <div className="space-y-1.5">
-                        <label className="text-sm font-semibold text-slate-700">Ubicación (Subbodega)</label>
-                        <select
-                            className="w-full px-4 py-2 border border-slate-200 rounded-lg text-slate-900 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none transition-all bg-white"
-                            value={formData.subbodega}
-                            onChange={(e) => {
-                                const subId = e.target.value;
-                                setFormData(prev => ({ ...prev, subbodega: subId, material: '' }));
+                    <div className="col-span-1">
+                        <SubbodegaSelector
+                            subbodegas={bodegas.find(b => b.id.toString() === formData.bodega)?.subbodegas || []}
+                            selectedId={formData.subbodega}
+                            onChange={(id) => {
+                                setFormData(prev => ({ ...prev, subbodega: id, material: '' }));
                                 setSelectedStockItem(null);
                             }}
                             disabled={!formData.bodega}
-                        >
-                            <option value="">Todas las ubicaciones</option>
-                            {bodegas.find(b => b.id.toString() === formData.bodega)?.subbodegas
-                                ?.filter(sb => sb.activo)
-                                .sort((a, b) => (a.full_path || a.nombre).localeCompare(b.full_path || b.nombre))
-                                .map(sb => (
-                                    <option key={sb.id} value={sb.id}>
-                                        {sb.full_path || sb.nombre}
-                                    </option>
-                                ))}
-                        </select>
+                            errorColor="rose"
+                            allOptionLabel="Todas las ubicaciones"
+                        />
                     </div>
 
                     <div className="col-span-2 space-y-3.5">

@@ -5,6 +5,7 @@ import api from '@/lib/api';
 import { Bodega, BodegaStock } from '@/types';
 import { Modal } from './ui/Modal';
 import { Save, AlertCircle, ArrowRightLeft, Scan, Tag, Type } from 'lucide-react';
+import { SubbodegaSelector } from './SubbodegaSelector';
 
 interface RegistrarTrasladoModalProps {
     isOpen: boolean;
@@ -166,31 +167,21 @@ export function RegistrarTrasladoModal({ isOpen, onClose, onSuccess }: Registrar
                         </select>
                     </div>
 
-                    <div className="space-y-1.5">
-                        <label className="text-sm font-semibold text-slate-700">Ubicación Origen</label>
-                        <select
-                            className="w-full px-4 py-2 border border-slate-200 rounded-lg text-slate-900 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all bg-white"
-                            value={formData.subbodega_origen}
-                            onChange={(e) => {
-                                const subId = e.target.value;
-                                setFormData(prev => ({ ...prev, subbodega_origen: subId, material: '' }));
+                    <div className="col-span-1">
+                        <SubbodegaSelector
+                            label="Ubicación Origen"
+                            subbodegas={bodegas.find(b => b.id.toString() === formData.bodega_origen)?.subbodegas || []}
+                            selectedId={formData.subbodega_origen}
+                            onChange={(id) => {
+                                setFormData(prev => ({ ...prev, subbodega_origen: id, material: '' }));
                                 setSelectedStockItem(null);
                             }}
                             disabled={!formData.bodega_origen}
-                        >
-                            <option value="">Todas las ubicaciones</option>
-                            {bodegas.find(b => b.id.toString() === formData.bodega_origen)?.subbodegas
-                                ?.filter(sb => sb.activo)
-                                .sort((a, b) => (a.full_path || a.nombre).localeCompare(b.full_path || b.nombre))
-                                .map(sb => (
-                                    <option key={sb.id} value={sb.id}>
-                                        {sb.full_path || sb.nombre}
-                                    </option>
-                                ))}
-                        </select>
+                            allOptionLabel="Todas las ubicaciones"
+                        />
                     </div>
 
-                    <div className="space-y-1.5">
+                    <div className="space-y-1.5 col-span-1">
                         <label className="text-sm font-semibold text-slate-700">Bodega Destino *</label>
                         <select
                             required
@@ -211,29 +202,16 @@ export function RegistrarTrasladoModal({ isOpen, onClose, onSuccess }: Registrar
                         </select>
                     </div>
 
-                    <div className="space-y-1.5">
-                        <label className="text-sm font-semibold text-slate-700">Ubicación Destino *</label>
-                        <select
-                            required
-                            className="w-full px-4 py-2 border border-slate-200 rounded-lg text-slate-900 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all bg-white"
-                            value={formData.subbodega_destino}
-                            onChange={(e) => setFormData({ ...formData, subbodega_destino: e.target.value })}
+                    <div className="col-span-1">
+                        <SubbodegaSelector
+                            label="Ubicación Destino"
+                            subbodegas={bodegas.find(b => b.id.toString() === formData.bodega_destino)?.subbodegas || []}
+                            selectedId={formData.subbodega_destino}
+                            onChange={(id) => setFormData({ ...formData, subbodega_destino: id })}
                             disabled={!formData.bodega_destino}
-                        >
-                            <option value="">Seleccione ubicación...</option>
-                            {bodegas.find(b => b.id.toString() === formData.bodega_destino)?.subbodegas
-                                ?.filter(sb => sb.activo)
-                                .sort((a, b) => (a.full_path || a.nombre).localeCompare(b.full_path || b.nombre))
-                                .map(sb => (
-                                    <option
-                                        key={sb.id}
-                                        value={sb.id}
-                                        disabled={formData.bodega_origen === formData.bodega_destino && sb.id.toString() === formData.subbodega_origen}
-                                    >
-                                        {sb.full_path || sb.nombre} {formData.bodega_origen === formData.bodega_destino && sb.id.toString() === formData.subbodega_origen ? '(Origen)' : ''}
-                                    </option>
-                                ))}
-                        </select>
+                            required
+                            disabledIds={formData.bodega_origen === formData.bodega_destino ? [formData.subbodega_origen] : []}
+                        />
                     </div>
 
                     <div className="col-span-2 space-y-3.5">
