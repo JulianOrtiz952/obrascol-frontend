@@ -3,7 +3,7 @@ import { Bodega, Subbodega, BodegaStock, PaginatedResponse, Marca, Material, Uni
 
 const api = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/',
-    timeout: 10000,
+    timeout: 60000,
 });
 
 // Interceptor para agregar el token a las solicitudes
