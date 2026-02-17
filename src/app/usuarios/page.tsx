@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { usuarios as usuariosApi } from '@/lib/api';
 import api from '@/lib/api';
 import {
     Users,
@@ -39,8 +40,8 @@ export default function UsuariosPage() {
     const fetchUsuarios = async () => {
         setLoading(true);
         try {
-            const res = await api.get('usuarios/');
-            setUsuarios(res.data);
+            const res = await usuariosApi.getAll();
+            setUsuarios(res.data.results);
         } catch (error) {
             console.error('Error fetching users:', error);
         } finally {

@@ -36,8 +36,8 @@ export function EditMaterialModal({ isOpen, onClose, onSuccess, materialId }: Ed
                 try {
                     const [matRes, marRes, uniRes] = await Promise.all([
                         api.get(`materiales/${materialId}/`),
-                        api.get('marcas/'),
-                        api.get('unidades/'),
+                        api.get<{ results: Marca[] }>('marcas/'),
+                        api.get<{ results: UnidadMedida[] }>('unidades/'),
                     ]);
 
                     const mat = matRes.data;
@@ -49,8 +49,8 @@ export function EditMaterialModal({ isOpen, onClose, onSuccess, materialId }: Ed
                         marca: mat.marca?.toString() || '',
                         codigo_barras: mat.codigo_barras || ''
                     });
-                    setMarcas(marRes.data);
-                    setUnidadesMedida(uniRes.data);
+                    setMarcas(marRes.data.results);
+                    setUnidadesMedida(uniRes.data.results);
                 } catch (err) {
                     console.error('Error fetching material data:', err);
                     onClose();

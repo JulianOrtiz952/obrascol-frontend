@@ -7,9 +7,10 @@ import SubbodegaStockModal from './SubbodegaStockModal';
 interface SubbodegaManagerProps {
     bodegaId: number;
     onUpdate?: () => void;
+    readOnly?: boolean;
 }
 
-export default function SubbodegaManager({ bodegaId, onUpdate }: SubbodegaManagerProps) {
+export default function SubbodegaManager({ bodegaId, onUpdate, readOnly = false }: SubbodegaManagerProps) {
     const [list, setList] = useState<Subbodega[]>([]);
     const [stock, setStock] = useState<BodegaStock[]>([]);
     const [loading, setLoading] = useState(true);
@@ -37,7 +38,7 @@ export default function SubbodegaManager({ bodegaId, onUpdate }: SubbodegaManage
                 bodegas.getStock(bodegaId, currentParent?.id)
             ]);
 
-            setList(listRes.data);
+            setList(listRes.data.results);
             setStock(stockRes.data);
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -134,7 +135,7 @@ export default function SubbodegaManager({ bodegaId, onUpdate }: SubbodegaManage
                                 <Eye className="w-4 h-4" />
                             </button>
                         )}
-                        {!isCreating && (
+                        {!isCreating && !readOnly && (
                             <button
                                 onClick={() => setIsCreating(true)}
                                 className="text-xs flex items-center gap-1 text-orange-600 hover:text-orange-700 font-bold"
@@ -227,18 +228,22 @@ export default function SubbodegaManager({ bodegaId, onUpdate }: SubbodegaManage
                                                 >
                                                     <Eye className="w-3.5 h-3.5" />
                                                 </button>
-                                                <button
-                                                    onClick={(e) => { e.stopPropagation(); setEditingId(sub.id); setEditName(sub.nombre); }}
-                                                    className="p-1 text-slate-400 hover:text-slate-600 hover:bg-white rounded-lg transition-colors border border-transparent hover:border-slate-100"
-                                                >
-                                                    <Edit2 className="w-3.5 h-3.5" />
-                                                </button>
-                                                <button
-                                                    onClick={(e) => { e.stopPropagation(); handleToggle(sub.id); }}
-                                                    className={`p-1 rounded-lg transition-colors border border-transparent hover:border-slate-100 ${sub.activo ? 'text-orange-400 hover:text-orange-600' : 'text-emerald-400 hover:text-emerald-600'} hover:bg-white`}
-                                                >
-                                                    {sub.activo ? <PowerOff className="w-3.5 h-3.5" /> : <Power className="w-3.5 h-3.5" />}
-                                                </button>
+                                                {!readOnly && (
+                                                    <>
+                                                        <button
+                                                            onClick={(e) => { e.stopPropagation(); setEditingId(sub.id); setEditName(sub.nombre); }}
+                                                            className="p-1 text-slate-400 hover:text-slate-600 hover:bg-white rounded-lg transition-colors border border-transparent hover:border-slate-100"
+                                                        >
+                                                            <Edit2 className="w-3.5 h-3.5" />
+                                                        </button>
+                                                        <button
+                                                            onClick={(e) => { e.stopPropagation(); handleToggle(sub.id); }}
+                                                            className={`p-1 rounded-lg transition-colors border border-transparent hover:border-slate-100 ${sub.activo ? 'text-orange-400 hover:text-orange-600' : 'text-emerald-400 hover:text-emerald-600'} hover:bg-white`}
+                                                        >
+                                                            {sub.activo ? <PowerOff className="w-3.5 h-3.5" /> : <Power className="w-3.5 h-3.5" />}
+                                                        </button>
+                                                    </>
+                                                )}
                                             </div>
                                         </div>
 

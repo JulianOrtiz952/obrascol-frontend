@@ -33,7 +33,7 @@ export default function MovimientosPage() {
         setLoading(true);
         try {
             const res = await api.get('movimientos/');
-            setMovimientos(res.data);
+            setMovimientos(res.data.results || []);
         } catch (error) {
             console.error('Error fetching movimientos:', error);
         } finally {

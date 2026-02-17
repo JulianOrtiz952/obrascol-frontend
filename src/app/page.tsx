@@ -15,16 +15,18 @@ import {
 import Link from 'next/link';
 import { bodegas } from '@/lib/api';
 import { Bodega } from '@/types';
+import WarehouseDetailsModal from '@/components/WarehouseDetailsModal';
 
 export default function Home() {
   const [warehouses, setWarehouses] = useState<Bodega[]>([]);
+  const [selectedBodega, setSelectedBodega] = useState<Bodega | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const res = await bodegas.getAll();
-        setWarehouses(res.data.filter(b => b.activo));
+        setWarehouses(res.data.results.filter(b => b.activo));
       } catch (error) {
         console.error('Error fetching warehouses:', error);
       } finally {
@@ -86,10 +88,10 @@ export default function Home() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
               {warehouses.length > 0 ? (
                 warehouses.map((bodega) => (
-                  <Link
+                  <div
                     key={bodega.id}
-                    href={`/bodegas`}
-                    className="group relative p-6 bg-white border border-slate-200 rounded-[2rem] shadow-sm hover:shadow-2xl hover:border-orange-500/30 hover:-translate-y-1.5 transition-all duration-500 overflow-hidden"
+                    onClick={() => setSelectedBodega(bodega)}
+                    className="group relative p-6 bg-white border border-slate-200 rounded-[2rem] shadow-sm hover:shadow-2xl hover:border-orange-500/30 hover:-translate-y-1.5 transition-all duration-500 overflow-hidden cursor-pointer"
                   >
                     <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
                       <Warehouse className="w-24 h-24 rotate-12" />
@@ -119,7 +121,7 @@ export default function Home() {
                         <ArrowRight className="w-4 h-4 text-orange-600" />
                       </div>
                     </div>
-                  </Link>
+                  </div>
                 ))
               ) : (
                 <div className="col-span-full py-20 text-center bg-slate-50 border-2 border-dashed border-slate-200 rounded-[2.5rem]">
@@ -191,6 +193,12 @@ export default function Home() {
           <div className="px-3 py-1 bg-slate-50 rounded-lg text-slate-300">v1.2.0</div>
         </div>
       </footer>
+
+      <WarehouseDetailsModal
+        isOpen={!!selectedBodega}
+        onClose={() => setSelectedBodega(null)}
+        bodega={selectedBodega}
+      />
     </div>
   );
 }

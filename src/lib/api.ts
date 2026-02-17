@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Bodega, Subbodega, BodegaStock } from '@/types';
+import { Bodega, Subbodega, BodegaStock, PaginatedResponse, Marca, Material, UnidadMedida } from '@/types';
 
 const api = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/',
@@ -35,7 +35,7 @@ api.interceptors.response.use(
 // Bodegas API
 export const bodegas = {
     getAll: (incluirInactivas = false) =>
-        api.get<Bodega[]>(`bodegas/${incluirInactivas ? '?incluir_inactivas=true' : ''}`),
+        api.get<PaginatedResponse<Bodega>>(`bodegas/${incluirInactivas ? '?incluir_inactivas=true' : ''}`),
 
     getById: (id: number) =>
         api.get<Bodega>(`bodegas/${id}/`),
@@ -55,7 +55,7 @@ export const bodegas = {
     getStock: (id: number, subbodegaId?: number) => {
         let url = `bodegas/${id}/stock_actual/`;
         if (subbodegaId) url += `?subbodega=${subbodegaId}`;
-        return api.get<BodegaStock[]>(url);
+        return api.get<BodegaStock[]>(url); // Note: actions usually aren't paginated unless specified
     },
 };
 
@@ -68,7 +68,7 @@ export const subbodegas = {
         if (incluirInactivas) params.append('incluir_inactivas', 'true');
         if (parentId !== undefined) params.append('parent', String(parentId));
         if (params.toString()) url += `?${params.toString()}`;
-        return api.get<Subbodega[]>(url);
+        return api.get<PaginatedResponse<Subbodega>>(url);
     },
 
     create: (data: Omit<Subbodega, 'id'>) =>
@@ -79,6 +79,29 @@ export const subbodegas = {
 
     toggleActivo: (id: number) =>
         api.post<Subbodega>(`subbodegas/${id}/toggle_activo/`),
+};
+
+// Marcas API
+export const marcas = {
+    getAll: () => api.get<PaginatedResponse<Marca>>('marcas/'),
+    create: (data: any) => api.post<Marca>('marcas/', data),
+    update: (id: number, data: any) => api.patch<Marca>(`marcas/${id}/`, data),
+};
+
+// Materiales API
+export const materiales = {
+    getAll: () => api.get<PaginatedResponse<Material>>('materiales/'),
+    getById: (id: number) => api.get<Material>(`materiales/${id}/`),
+};
+
+// Unidades API
+export const unidades = {
+    getAll: () => api.get<PaginatedResponse<UnidadMedida>>('unidades/'),
+};
+
+// Usuarios API
+export const usuarios = {
+    getAll: () => api.get<PaginatedResponse<any>>('usuarios/'),
 };
 
 export default api;

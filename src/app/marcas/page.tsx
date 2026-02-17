@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import api from '@/lib/api';
+import { marcas as marcasApi } from '@/lib/api';
 import { Marca } from '@/types';
-import { Plus, Search, Pencil, Trash2, Check, X, Box, Shield } from 'lucide-react';
+import { Plus, Search, Pencil, Check, X, Box, Shield } from 'lucide-react';
 import { Modal } from '@/components/ui/Modal';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { useAuth } from '@/contexts/AuthContext';
@@ -30,8 +30,8 @@ export default function MarcasPage() {
 
     const fetchMarcas = async () => {
         try {
-            const res = await api.get('marcas/');
-            setMarcas(res.data);
+            const res = await marcasApi.getAll();
+            setMarcas(res.data.results);
         } catch (err) {
             console.error('Error fetching marcas:', err);
         } finally {
@@ -67,9 +67,9 @@ export default function MarcasPage() {
         e.preventDefault();
         try {
             if (editingMarca) {
-                await api.patch(`/marcas/${editingMarca.id}/`, formData);
+                await marcasApi.update(editingMarca.id, formData);
             } else {
-                await api.post('marcas/', formData);
+                await marcasApi.create(formData);
             }
             fetchMarcas();
             setIsModalOpen(false);
@@ -91,7 +91,7 @@ export default function MarcasPage() {
         if (!marca) return;
 
         try {
-            await api.patch(`/marcas/${marca.id}/`, { activo: !marca.activo });
+            await marcasApi.update(marca.id, { activo: !marca.activo });
             fetchMarcas();
         } catch (err) {
             console.error('Error updating status:', err);

@@ -9,11 +9,11 @@ import CreateBodegaModal from '@/components/CreateBodegaModal';
 import EditBodegaModal from '@/components/EditBodegaModal';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import SubbodegaManager from '@/components/SubbodegaManager';
+import WarehouseStockView from '@/components/WarehouseStockView';
 
 export default function BodegasPage() {
     const [bodegasList, setBodegasList] = useState<Bodega[]>([]);
     const [selectedBodega, setSelectedBodega] = useState<Bodega | null>(null);
-    const [stock, setStock] = useState<BodegaStock[]>([]);
     const [activeTab, setActiveTab] = useState<'stock' | 'locations'>('stock');
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
@@ -29,14 +29,6 @@ export default function BodegasPage() {
         bodega: null
     });
 
-    // Group stock by subbodega
-    const stockBySubbodega = stock.reduce((acc, item) => {
-        const subName = item.subbodega_nombre || 'General';
-        if (!acc[subName]) acc[subName] = [];
-        acc[subName].push(item);
-        return acc;
-    }, {} as Record<string, BodegaStock[]>);
-
     useEffect(() => {
         fetchBodegas();
     }, [incluirInactivas]);
@@ -45,11 +37,11 @@ export default function BodegasPage() {
         try {
             setLoading(true);
             const response = await bodegas.getAll(incluirInactivas);
-            setBodegasList(response.data);
+            setBodegasList(response.data.results);
 
             // Re-select bodega to update its subbodegas/info if it was selected
             if (selectedBodega) {
-                const updated = response.data.find(b => b.id === selectedBodega.id);
+                const updated = response.data.results.find(b => b.id === selectedBodega.id);
                 if (updated) setSelectedBodega(updated);
             }
         } catch (error) {
@@ -59,23 +51,12 @@ export default function BodegasPage() {
         }
     };
 
-    const fetchStock = async (bodegaId: number) => {
-        try {
-            const response = await bodegas.getStock(bodegaId);
-            setStock(response.data);
-        } catch (error) {
-            console.error('Error fetching stock:', error);
-        }
-    };
-
-    const handleSelectBodega = async (bodega: Bodega) => {
+    const handleSelectBodega = (bodega: Bodega) => {
         if (selectedBodega?.id === bodega.id) {
             setSelectedBodega(null);
-            setStock([]);
         } else {
             setSelectedBodega(bodega);
             setActiveTab('stock');
-            await fetchStock(bodega.id);
         }
     };
 
@@ -230,52 +211,7 @@ export default function BodegasPage() {
                                     </div>
 
                                     {activeTab === 'stock' ? (
-                                        <div className="space-y-6">
-                                            {Object.keys(stockBySubbodega).length === 0 ? (
-                                                <p className="text-sm text-slate-500 text-center py-4">No hay materiales en stock</p>
-                                            ) : (
-                                                Object.entries(stockBySubbodega)
-                                                    .sort(([a], [b]) => a.localeCompare(b))
-                                                    .map(([subName, items]) => (
-                                                        <div key={subName} className="space-y-2">
-                                                            <div className="flex items-center justify-between mb-1">
-                                                                <div className="flex items-center gap-1.5 overflow-hidden">
-                                                                    <MapPin className="w-3 h-3 text-orange-500 shrink-0" />
-                                                                    <div className="flex items-center gap-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider truncate">
-                                                                        {subName.split(' > ').map((part, idx, arr) => (
-                                                                            <React.Fragment key={idx}>
-                                                                                <span className={idx === arr.length - 1 ? 'text-slate-600' : ''}>{part}</span>
-                                                                                {idx < arr.length - 1 && <span className="text-slate-300">/</span>}
-                                                                            </React.Fragment>
-                                                                        ))}
-                                                                    </div>
-                                                                </div>
-                                                                <span className="bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded text-[10px] font-bold shrink-0">{items.length}</span>
-                                                            </div>
-                                                            <div className="grid gap-2">
-                                                                {items.map((item) => (
-                                                                    <div
-                                                                        key={`${item.id_material}-${item.id_subbodega}`}
-                                                                        className="flex items-center justify-between p-3 bg-white rounded-lg border border-slate-200 hover:border-orange-200 transition-colors shadow-sm"
-                                                                    >
-                                                                        <div className="flex-1 min-w-0 pr-4">
-                                                                            <p className="font-bold text-slate-900 text-sm truncate">{item.nombre}</p>
-                                                                            <p className="text-[10px] text-slate-500 font-mono truncate">
-                                                                                {item.codigo}
-                                                                                {item.referencia && ` • ${item.referencia}`}
-                                                                            </p>
-                                                                        </div>
-                                                                        <div className="text-right shrink-0">
-                                                                            <p className="font-black text-slate-900 text-base leading-none">{item.cantidad}</p>
-                                                                            <p className="text-[10px] text-slate-400 font-bold uppercase">{item.unidad}</p>
-                                                                        </div>
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                        </div>
-                                                    ))
-                                            )}
-                                        </div>
+                                        <WarehouseStockView bodegaId={bodega.id} />
                                     ) : (
                                         <SubbodegaManager
                                             bodegaId={bodega.id}

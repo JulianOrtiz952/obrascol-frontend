@@ -47,15 +47,15 @@ export function RegistrarEntradaModal({ isOpen, onClose, onSuccess }: RegistrarE
             const fetchData = async () => {
                 try {
                     const [matRes, bodRes, marRes, uniRes] = await Promise.all([
-                        api.get('materiales/'),
-                        api.get('bodegas/'),
-                        api.get('marcas/'),
-                        api.get('unidades/'),
+                        api.get<{ results: Material[] }>('materiales/'),
+                        api.get<{ results: Bodega[] }>('bodegas/'),
+                        api.get<{ results: Marca[] }>('marcas/'),
+                        api.get<{ results: UnidadMedida[] }>('unidades/'),
                     ]);
-                    setMateriales(matRes.data);
-                    setBodegas(bodRes.data);
-                    setMarcas(marRes.data);
-                    setUnidadesMedida(uniRes.data);
+                    setMateriales(matRes.data.results);
+                    setBodegas(bodRes.data.results);
+                    setMarcas(marRes.data.results);
+                    setUnidadesMedida(uniRes.data.results);
 
                     // Auto-focus barcode field
                     setTimeout(() => barcodeInputRef.current?.focus(), 100);
@@ -218,8 +218,7 @@ export function RegistrarEntradaModal({ isOpen, onClose, onSuccess }: RegistrarE
                     referencia: formData.referencia,
                     nombre: formData.nombre,
                     unidad: formData.unidad,
-                    marca: finalMarcaId || null,
-                    ultimo_precio: null
+                    marca: finalMarcaId || null
                 });
                 materialId = matRes.data.id;
             } else if (materialId && finalMarcaId) {
@@ -247,7 +246,6 @@ export function RegistrarEntradaModal({ isOpen, onClose, onSuccess }: RegistrarE
                 factura_manual: formData.factura_manual,
                 marca: finalMarcaId || null,
                 cantidad: parseInt(formData.cantidad),
-                precio: null,
                 fecha: submitDate,
                 tipo: 'Entrada',
                 observaciones: formData.observaciones

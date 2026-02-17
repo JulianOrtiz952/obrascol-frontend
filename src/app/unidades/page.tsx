@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { unidades as unidadesApi } from '@/lib/api';
 import api from '@/lib/api';
 import { UnidadMedida } from '@/types';
 import { Plus, Search, Pencil, Check, X, Box, Ruler } from 'lucide-react';
@@ -30,8 +31,8 @@ export default function UnidadesPage() {
 
     const fetchUnidades = async () => {
         try {
-            const res = await api.get('unidades/');
-            setUnidades(res.data);
+            const res = await unidadesApi.getAll();
+            setUnidades(res.data.results);
         } catch (err) {
             console.error('Error fetching unidades:', err);
         } finally {

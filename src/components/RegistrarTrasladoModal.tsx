@@ -36,8 +36,8 @@ export function RegistrarTrasladoModal({ isOpen, onClose, onSuccess }: Registrar
         if (isOpen) {
             const fetchData = async () => {
                 try {
-                    const bodRes = await api.get('bodegas/');
-                    setBodegas(bodRes.data);
+                    const bodRes = await api.get<{ results: Bodega[] }>('bodegas/');
+                    setBodegas(bodRes.data.results);
                 } catch (err) {
                     console.error('Error fetching bodegas:', err);
                 }
@@ -119,7 +119,6 @@ export function RegistrarTrasladoModal({ isOpen, onClose, onSuccess }: Registrar
                 bodega_destino: formData.bodega_destino,
                 subbodega_destino: formData.subbodega_destino || null,
                 cantidad: parseInt(formData.cantidad),
-                precio: null,
                 tipo: 'Traslado',
                 observaciones: formData.observaciones
             });

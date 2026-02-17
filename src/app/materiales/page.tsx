@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import api from '@/lib/api';
+import { materiales as materialesApi, marcas as marcasApi } from '@/lib/api';
 import { Material, Marca } from '@/types';
 import { Search, Edit, Package, Filter, Plus } from 'lucide-react';
 import { EditMaterialModal } from '@/components/EditMaterialModal';
@@ -29,11 +29,11 @@ export default function MaterialesPage() {
         setLoading(true);
         try {
             const [matRes, marRes] = await Promise.all([
-                api.get('materiales/'),
-                api.get('marcas/')
+                materialesApi.getAll(),
+                marcasApi.getAll()
             ]);
-            setMateriales(matRes.data);
-            setMarcas(marRes.data);
+            setMateriales(matRes.data.results);
+            setMarcas(marRes.data.results);
         } catch (err) {
             console.error('Error fetching data:', err);
         } finally {

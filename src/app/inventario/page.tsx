@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
 import {
     Package,
     Search,
@@ -11,15 +12,37 @@ import {
     Pencil
 } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
-import api from '@/lib/api';
-import { ResumenInventario } from '@/types';
+import api, { bodegas as bodegasApi } from '@/lib/api';
+import { ResumenInventario, Bodega } from '@/types';
 import { EditMaterialModal } from '@/components/EditMaterialModal';
 
 export default function InventarioPage() {
+    const searchParams = useSearchParams();
     const [inventario, setInventario] = useState<ResumenInventario[]>([]);
+    const [bodegas, setBodegas] = useState<Bodega[]>([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
+    const [selectedBodega, setSelectedBodega] = useState<string>('');
     const [editingMaterial, setEditingMaterial] = useState<number | null>(null);
+
+    useEffect(() => {
+        const fetchBodegas = async () => {
+            try {
+                const res = await bodegasApi.getAll();
+                setBodegas(res.data.results.filter(b => b.activo));
+            } catch (err) {
+                console.error('Error fetching bodegas:', err);
+            }
+        };
+        fetchBodegas();
+    }, []);
+
+    useEffect(() => {
+        const bodegaId = searchParams.get('bodega');
+        if (bodegaId) {
+            setSelectedBodega(bodegaId);
+        }
+    }, [searchParams]);
 
     useEffect(() => {
         const fetchInventario = async () => {
@@ -44,11 +67,17 @@ export default function InventarioPage() {
         }
     };
 
-    const filteredInventario = inventario.filter(item =>
-        item.nombre.toLowerCase().includes(search.toLowerCase()) ||
-        item.codigo.toLowerCase().includes(search.toLowerCase()) ||
-        item.referencia?.toLowerCase().includes(search.toLowerCase())
-    );
+    const filteredInventario = useMemo(() => {
+        return inventario.filter(item => {
+            const matchesSearch = item.nombre.toLowerCase().includes(search.toLowerCase()) ||
+                item.codigo.toLowerCase().includes(search.toLowerCase()) ||
+                item.referencia?.toLowerCase().includes(search.toLowerCase());
+
+            const matchesBodega = !selectedBodega || item.id_bodega.toString() === selectedBodega;
+
+            return matchesSearch && matchesBodega;
+        });
+    }, [inventario, search, selectedBodega]);
 
     return (
         <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-6">
@@ -77,8 +106,15 @@ export default function InventarioPage() {
                                 onChange={(e) => setSearch(e.target.value)}
                             />
                         </div>
-                        <select className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all">
-                            <option value="">Bodega</option>
+                        <select
+                            className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
+                            value={selectedBodega}
+                            onChange={(e) => setSelectedBodega(e.target.value)}
+                        >
+                            <option value="">Todas las Bodegas</option>
+                            {bodegas.map(b => (
+                                <option key={b.id} value={b.id}>{b.nombre}</option>
+                            ))}
                         </select>
                     </div>
                 </div>

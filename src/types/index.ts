@@ -58,7 +58,6 @@ export interface Material {
     unidad: string;
     marca?: number;
     marca_nombre?: string;
-    ultimo_precio?: number | null;
 }
 
 export interface Factura {
@@ -85,7 +84,6 @@ export interface Movimiento {
     factura?: number;
     factura_info?: Factura;
     cantidad: number;
-    precio?: number | null;
     fecha: string;
     tipo: TipoMovimiento;
     observaciones?: string;
@@ -108,4 +106,10 @@ export interface ResumenInventario {
     cantidad: number;
     unidad: string;
     estado: 'Alto' | 'Medio' | 'Bajo';
+}
+export interface PaginatedResponse<T> {
+    count: number;
+    next: string | null;
+    previous: string | null;
+    results: T[];
 }

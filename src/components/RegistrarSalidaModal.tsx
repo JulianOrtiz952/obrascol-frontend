@@ -44,8 +44,8 @@ export function RegistrarSalidaModal({ isOpen, onClose, onSuccess }: RegistrarSa
         if (isOpen) {
             const fetchData = async () => {
                 try {
-                    const bodRes = await api.get('bodegas/');
-                    setBodegas(bodRes.data);
+                    const bodRes = await api.get<{ results: Bodega[] }>('bodegas/');
+                    setBodegas(bodRes.data.results);
                 } catch (err) {
                     console.error('Error fetching bodegas:', err);
                 }
@@ -120,7 +120,6 @@ export function RegistrarSalidaModal({ isOpen, onClose, onSuccess }: RegistrarSa
                 bodega: formData.bodega,
                 subbodega: formData.subbodega || null,
                 cantidad: parseInt(formData.cantidad),
-                precio: null,
                 tipo: 'Salida'
             });
 
