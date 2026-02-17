@@ -76,7 +76,6 @@ export default function BodegasPage() {
             fetchBodegas();
             if (selectedBodega?.id === bodega.id) {
                 setSelectedBodega(null);
-                setStock([]);
             }
         } catch (error) {
             console.error('Error toggling bodega:', error);
